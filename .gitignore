@@ -1,0 +1,13 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+.expo/
+dist/
+build/
+
+# Solo se usa pnpm
+package-lock.json
+yarn.lock

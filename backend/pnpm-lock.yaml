@@ -224,6 +224,9 @@ importers:
       multer:
         specifier: ^2.4.0
         version: 2.4.0
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
 
 packages:
 
@@ -685,6 +688,9 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  zod@4.6.7:
+    resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
 snapshots:
 
@@ -1161,3 +1167,5 @@ snapshots:
       webidl-conversions: 7.0.0
 
   wrappy@1.0.2: {}
+
+  zod@4.6.7: {}

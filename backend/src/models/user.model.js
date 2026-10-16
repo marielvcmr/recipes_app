@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Mongoose adds and maintains createdAt (when it was created) and updatedAt (last change) automatically.
     versionKey: false,
     toJSON: {
       transform(doc, ret) {
@@ -42,9 +42,13 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.index({ email: 1 }, { unique: true });
+
 userSchema.index(
   { username: 1 },
   { unique: true, collation: { locale: 'en', strength: 2 } },
 );
 
 export const User = mongoose.model('User', userSchema);
+
+// defines how a user looks like in the model and returns a user for reading and writing objects 
+

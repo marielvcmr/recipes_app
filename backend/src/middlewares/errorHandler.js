@@ -20,11 +20,14 @@ export function errorHandler(err, req, res, next) {
       message: e.message,
     }));
     error = new AppError(400, 'VALIDATION_ERROR', 'Hay campos inválidos.', details);
-  } else if (err instanceof mongoose.Error.CastError) {
+  } 
+  else if (err instanceof mongoose.Error.CastError) {
     error = new AppError(404, 'NOT_FOUND', 'El recurso no existe.');
-  } else if (err.type === 'entity.parse.failed') {
+  } 
+  else if (err.type === 'entity.parse.failed') {
     error = new AppError(400, 'VALIDATION_ERROR', 'El cuerpo de la petición no es JSON válido.');
-  } else if (err.code === 11000) {
+  } 
+  else if (err.code === 11000) {
     const field = Object.keys(err.keyPattern ?? {})[0];
     const duplicate = DUPLICATE_ERRORS[field];
     if (duplicate) {

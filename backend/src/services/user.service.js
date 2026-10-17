@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from './auth.service.js';
+import { Recipe } from '../models/recipe.model.js';
 
 export async function updateUser(user, { password, ...changes }) 
 {
@@ -13,10 +14,16 @@ export async function updateUser(user, { password, ...changes })
   return user;
 }
 
+export async function getUserCounts(user) {
+  const recipes = await Recipe.countDocuments({ owner: user._id });
+  return { recipes };
+}
+
+
 export async function deleteUser(user) {
   /*
-    Holder to also delete this user's recipes, groups and images
+    Holder to also delete this user's groups and images
   */
-
+  await Recipe.deleteMany({ owner: user._id });
   await user.deleteOne();
 }

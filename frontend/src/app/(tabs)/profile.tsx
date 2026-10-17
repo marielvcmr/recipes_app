@@ -119,12 +119,7 @@ export default function ProfileScreen() {
       <ProfileBrief recipes={counts.recipes} groups={counts.groups} />
 
       <View style={styles.menu}>
-        <ProfileOptionsMenu
-          // TODO: abrir los datos de la cuenta cuando esté su mockup
-          onAccountData={() => {}}
-          onSignOut={signOut}
-          onDeleteAccount={handleDeleteAccount}
-        />
+        <ProfileOptionsMenu onSignOut={signOut} onDeleteAccount={handleDeleteAccount} />
       </View>
 
       <BottomSheet visible={editing} onClose={closeEdit}>

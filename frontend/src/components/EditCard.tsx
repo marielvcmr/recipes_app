@@ -84,7 +84,7 @@ export default function EditCard({ user, onSubmit, onClose, loading = false, err
         labelStyle={styles.label}
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        revealable
         autoCapitalize="none"
         autoComplete="new-password"
         textContentType="newPassword"

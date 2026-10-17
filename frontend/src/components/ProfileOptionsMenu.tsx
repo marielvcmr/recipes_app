@@ -4,23 +4,13 @@ import ProfileOption from '@/components/ProfileOption';
 import { colors } from '@/styles/global';
 
 type ProfileOptionsMenuProps = {
-  onAccountData: () => void;
   onSignOut: () => void;
   onDeleteAccount: () => void;
 };
 
-export default function ProfileOptionsMenu({
-  onAccountData,
-  onSignOut,
-  onDeleteAccount,
-}: ProfileOptionsMenuProps) {
+export default function ProfileOptionsMenu({ onSignOut, onDeleteAccount }: ProfileOptionsMenuProps) {
   return (
     <View style={styles.card}>
-      <ProfileOption
-        icon={require('@/assets/images/profile/user.svg')}
-        label="Datos de la cuenta"
-        onPress={onAccountData}
-      />
       <ProfileOption
         icon={require('@/assets/images/profile/sign-out.svg')}
         label="Cerrar sesión"

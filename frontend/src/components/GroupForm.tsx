@@ -39,19 +39,36 @@ export default function GroupForm({ group, onSubmit, onClose, loading = false, e
   const editing = !!group;
   const [name, setName] = useState(group?.name ?? '');
   const [recipeIds, setRecipeIds] = useState<string[]>(() => group?.recipes.map((recipe) => recipe.id) ?? []);
-  // Error que se detecta aquí mismo (nombre muy corto), antes de llamar al backend
+  // Errores que se detectan aquí mismo (nombre muy corto, ninguna receta), antes de llamar al backend
   const [localErrors, setLocalErrors] = useState<FormErrors>();
   const shown = localErrors ?? errors;
   const fields = shown?.fields ?? {};
 
   const handleSubmit = () => {
     const trimmed = name.trim();
+    const fields: Record<string, string> = {};
     if (trimmed.length < NAME_MIN) {
-      setLocalErrors({ fields: { name: `El nombre del grupo debe tener entre ${NAME_MIN} y ${NAME_MAX} caracteres.` } });
+      fields.name = `El nombre del grupo debe tener entre ${NAME_MIN} y ${NAME_MAX} caracteres.`;
+    }
+    // Un grupo no puede quedar vacío (mismo mensaje que el backend)
+    if (recipeIds.length === 0) {
+      fields.recipeIds = 'Elige al menos una receta para el grupo.';
+    }
+    if (Object.keys(fields).length > 0) {
+      setLocalErrors({ fields });
       return;
     }
     setLocalErrors(undefined);
     onSubmit({ name: trimmed, recipeIds });
+  };
+
+  // Al corregir un campo se quita su aviso, sin borrar el del otro
+  const clearLocalError = (field: string) => {
+    setLocalErrors((current) => {
+      if (!current?.fields[field]) return current;
+      const { [field]: _removed, ...rest } = current.fields;
+      return Object.keys(rest).length > 0 ? { fields: rest } : undefined;
+    });
   };
 
   return (
@@ -76,7 +93,7 @@ export default function GroupForm({ group, onSubmit, onClose, loading = false, e
         value={name}
         onChangeText={(text) => {
           setName(text);
-          setLocalErrors(undefined);
+          clearLocalError('name');
         }}
         maxLength={NAME_MAX}
         error={fields.name}
@@ -84,9 +101,15 @@ export default function GroupForm({ group, onSubmit, onClose, loading = false, e
 
       <View>
         <Text style={styles.label}>
-          Recetas propias <Text style={styles.optional}>Opcional</Text>
+          Recetas propias <Text style={styles.optional}>Al menos una</Text>
         </Text>
-        <RecipePicker selected={recipeIds} onChange={setRecipeIds} />
+        <RecipePicker
+          selected={recipeIds}
+          onChange={(ids) => {
+            setRecipeIds(ids);
+            clearLocalError('recipeIds');
+          }}
+        />
         {fields.recipeIds && <Text style={styles.error}>{fields.recipeIds}</Text>}
       </View>
 

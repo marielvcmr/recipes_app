@@ -213,6 +213,14 @@ export default function GroupsScreen() {
   // Quitar una receta es un borrado lógico y reversible: se quita de la lista al instante, sin confirmar
   const handleRemoveRecipe = async (recipe: GroupRecipe) => {
     if (!detail) return;
+    // Un grupo debe tener al menos una receta: la última no se puede quitar
+    if (detail.recipes.length <= 1) {
+      Alert.alert(
+        'No se puede quitar',
+        'Un grupo debe tener al menos una receta. Si ya no lo necesitas, elimínalo con la papelera.',
+      );
+      return;
+    }
     const before = detail;
     setDetail({
       ...before,

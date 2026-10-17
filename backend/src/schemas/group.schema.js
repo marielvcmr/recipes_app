@@ -12,9 +12,10 @@ const recipeIdsField = z
   .max(100, 'Máximo 100 recetas por petición.')
   .transform(uniqueIds);
 
+// Un grupo se crea con al menos una receta
 export const createGroupSchema = z.object({
   name: groupNameField,
-  recipeIds: recipeIdsField.optional(),
+  recipeIds: recipeIdsField.refine((ids) => ids.length > 0, 'Elige al menos una receta para el grupo.'),
 });
 
 export const renameGroupSchema = z.object({

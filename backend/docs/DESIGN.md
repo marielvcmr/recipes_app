@@ -92,7 +92,7 @@ Los ingredientes, los pasos y la pertenencia a grupos se guardan **dentro** de c
 | ---------- | ------ | ----------- |
 | `name`     | String | Nombre del ingrediente. |
 | `quantity` | Number | Cantidad. |
-| `unit`     | String | `unidades` \| `g` \| `ml` \| `tazas` \| `cucharadas` |
+| `unit`     | String | `g` \| `kg` \| `ml` \| `l` \| `lb` \| `oz` \| `fl. oz.` \| `tazas` \| `cucharadas` \| `cucharaditas` \| `unidades` \| `dientes` \| `hojas` \| `pizcas` \| `puñados` \| `chorritos` \| `paquetes` |
 
 #### Step — subdocumento de Recipe
 

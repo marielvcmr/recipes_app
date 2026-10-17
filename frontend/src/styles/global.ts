@@ -15,6 +15,15 @@ export const colors = {
   // Fondo del avatar cuando el usuario no tiene avatarColor
   avatar: '#76505b',
   closeButton: '#f0ece4',
+  // Fondo del selector Todas/Públicas/Privadas
+  segmentBg: '#f2eee6',
+  // Círculos de número de paso y fondo de receta sin foto
+  badge: '#eee8dd',
+  // Puntos separadores "•" en la info de una receta
+  dot: '#c9c4ba',
+  // Botón Eliminar de una receta
+  dangerSoft: '#fff7f5',
+  dangerBorder: '#ecd2cc',
   // Oscurece la pantalla detrás de una hoja inferior (BottomSheet)
   backdrop: 'rgba(24, 25, 20, 0.5)',
   // Degradado oscuro sobre la foto de fondo de login y registro

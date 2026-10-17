@@ -47,3 +47,43 @@ export type Group = {
   createdAt: string;
   updatedAt: string;
 };
+
+// Autor de una receta: el backend lo manda poblado (solo estos campos)
+export type RecipeOwner = {
+  id: string;
+  username: string;
+  avatarColor?: string;
+};
+
+export type Ingredient = {
+  name: string;
+  quantity: number;
+  unit: string;
+};
+
+export type Step = {
+  position: number;
+  description: string;
+};
+
+// Receta como viene en los listados (GET /recipes/mine, GET /recipes): sin ingredientes ni pasos
+export type RecipeSummary = {
+  id: string;
+  owner: RecipeOwner;
+  name: string;
+  description: string;
+  timeMinutes: number;
+  difficulty: string;
+  isPublic: boolean;
+  imageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Receta completa (GET /recipes/:id). groupIds solo viene si la receta es mía
+export type Recipe = RecipeSummary & {
+  ingredients: Ingredient[];
+  steps: Step[];
+  groupIds?: string[];
+  isMine: boolean;
+};

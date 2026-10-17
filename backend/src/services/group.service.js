@@ -2,6 +2,8 @@ import { Group } from '../models/group.model.js';
 import { Recipe } from '../models/recipe.model.js';
 import { AppError } from '../utils/AppError.js';
 import { normalizeName, escapeRegex } from '../utils/normalizer.js';
+import { deleteImages } from './image.service.js';
+
 
 function notFound() {
   return new AppError(404, 'NOT_FOUND', 'El recurso no existe.');
@@ -34,6 +36,13 @@ function activeIn(groupId) {
   return { groups: { $elemMatch: { group: groupId, isActive: true } } };
 }
 
+async function findCoverUrl(groupId) {
+  const recipe = await Recipe.findOne({ ...activeIn(groupId), imageUrl: { $ne: null } })
+    .sort({ nameNormalized: 1 })
+    .select('imageUrl');
+  return recipe?.imageUrl ?? null;
+}
+
 async function addRecipes(group, recipes) {
   for (const recipe of recipes) {
     recipe.addToGroup(group._id);
@@ -42,9 +51,13 @@ async function addRecipes(group, recipes) {
 }
 
 async function withRecipeCount(group) {
-  const recipeCount = await Recipe.countDocuments(activeIn(group._id));
-  return { ...group.toJSON(), recipeCount };
+  const [recipeCount, coverUrl] = await Promise.all([
+    Recipe.countDocuments(activeIn(group._id)),
+    findCoverUrl(group._id),
+  ]);
+  return { ...group.toJSON(), recipeCount, coverUrl };
 }
+
 
 export async function createGroup(ownerId, { name, recipeIds = [] }) {
   const recipes = await findOwnRecipes(ownerId, recipeIds);
@@ -73,7 +86,8 @@ export async function getGroup(ownerId, groupId) {
   const recipes = await Recipe.find(activeIn(group._id))
     .select('-ingredients -steps -groups')
     .sort({ nameNormalized: 1 });
-  return { ...group.toJSON(), recipeCount: recipes.length, recipes };
+    const coverUrl = recipes.find((recipe) => recipe.imageUrl)?.imageUrl ?? null;
+  return { ...group.toJSON(), recipeCount: recipes.length, coverUrl, recipes };
 }
 
 export async function renameGroup(ownerId, groupId, { name }) {
@@ -99,13 +113,15 @@ export async function removeRecipeFromGroup(ownerId, groupId, recipeId) {
 
 export async function deleteGroup(ownerId, groupId) {
   const group = await findOwnGroup(ownerId, groupId);
-  // Phase 4: also delete the images of these recipes from Cloudinary
-  await Recipe.deleteMany(activeIn(group._id));
+  const recipes = await Recipe.find(activeIn(group._id)).select('imagePublicId');
+
+  await Recipe.deleteMany({ _id: { $in: recipes.map((recipe) => recipe._id) } });
   await Recipe.updateMany(
     { 'groups.group': group._id },
     { $pull: { groups: { group: group._id } } },
   );
   await group.deleteOne();
+  await deleteImages(recipes.map((recipe) => recipe.imagePublicId));
 }
 
 export async function assertOwnGroups(ownerId, groupIds) {

@@ -7,3 +7,6 @@ export const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
 // rules for recipes fields
 export const DIFFICULTIES = ['facil', 'media', 'dificil'];
 export const UNITS = ['unidades', 'g', 'ml', 'tazas', 'cucharadas'];
+
+// rule for MongoDB ids sent by the client
+export const OBJECT_ID_REGEX = /^[0-9a-fA-F]{24}$/;

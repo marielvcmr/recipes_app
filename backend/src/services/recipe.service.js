@@ -64,7 +64,7 @@ async function findPage(filter, { q, page, limit }) {
   }
 
   const query = Recipe.find(filter)
-    .select('-ingredients -steps')
+    .select('-ingredients -steps -groups')
     .populate('owner', 'username avatarColor')
     .sort({ nameNormalized: 1 })
     .skip((page - 1) * limit)

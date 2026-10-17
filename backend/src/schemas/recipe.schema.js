@@ -1,5 +1,14 @@
 import { z } from 'zod';
-import { DIFFICULTIES, UNITS } from '../utils/fieldRules.js';
+import { DIFFICULTIES, UNITS, OBJECT_ID_REGEX } from '../utils/fieldRules.js';
+
+export const objectIdField = z
+  .string({ error: 'Cada id debe ser texto.' })
+  .regex(OBJECT_ID_REGEX, 'El id no es válido.');
+
+export function uniqueIds(ids) {
+  return [...new Set(ids)];
+}
+
 
 const ingredientSchema = z.object({
   name: z
@@ -54,7 +63,7 @@ export const updateRecipeSchema = createRecipeSchema
   .partial()
   .refine((data) => Object.keys(data).length > 0, 'Envía al menos un campo para actualizar.');
 
-  const listQuery = {
+  export const listQuery = {
   q: z.string().trim().max(50, 'La búsqueda no puede superar 50 caracteres.').optional(),
   page: z.coerce
     .number({ error: 'page debe ser un número.' })

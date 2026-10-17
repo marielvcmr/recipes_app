@@ -5,13 +5,15 @@ import { StyleSheet, Text, View } from 'react-native';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import { colors, fonts } from '@/styles/global';
+import type { FormErrors } from '@/utils/errors';
 
 type RegisterCardProps = {
   onSubmit: (username: string, email: string, password: string) => void;
   loading?: boolean;
+  errors?: FormErrors;
 };
 
-export default function RegisterCard({ onSubmit, loading = false }: RegisterCardProps) {
+export default function RegisterCard({ onSubmit, loading = false, errors }: RegisterCardProps) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +33,7 @@ export default function RegisterCard({ onSubmit, loading = false }: RegisterCard
         autoCapitalize="none"
         autoComplete="username"
         textContentType="username"
+        error={errors?.fields.username}
       />
 
       <TextField
@@ -42,6 +45,7 @@ export default function RegisterCard({ onSubmit, loading = false }: RegisterCard
         autoCapitalize="none"
         autoComplete="email"
         textContentType="emailAddress"
+        error={errors?.fields.email}
       />
 
       <TextField
@@ -53,7 +57,10 @@ export default function RegisterCard({ onSubmit, loading = false }: RegisterCard
         autoCapitalize="none"
         autoComplete="new-password"
         textContentType="newPassword"
+        error={errors?.fields.password}
       />
+
+      {errors?.message && <Text style={styles.error}>{errors.message}</Text>}
 
       <View style={styles.buttonSpacing}>
         <Button
@@ -96,6 +103,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: 13,
     lineHeight: 19.5,
+  },
+  error: {
+    color: colors.error,
+    fontFamily: fonts.bold,
+    fontSize: 14,
+    lineHeight: 21,
+    textAlign: 'center',
   },
   buttonSpacing: {
     paddingTop: 6,

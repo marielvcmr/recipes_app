@@ -1,5 +1,7 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -10,12 +12,26 @@ import {
 } from 'react-native';
 
 import LoginCard from '@/components/LoginCard';
+import { useAuth } from '@/context/AuthContext';
 import { colors } from '@/styles/global';
+import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 export default function LoginScreen() {
-  // TODO: llamar a POST /auth/login cuando exista src/api/auth.ts
-  const handleLogin = (email: string, password: string) => {
-    console.log({ email, password });
+  const { signIn } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>();
+
+  const handleLogin = async (email: string, password: string) => {
+    setLoading(true);
+    setErrors(undefined);
+    try {
+      await signIn(email, password);
+      router.replace('/profile');
+    } catch (error) {
+      setErrors(toFormErrors(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,7 +62,7 @@ export default function LoginScreen() {
             />
           </View>
 
-          <LoginCard onSubmit={handleLogin} />
+          <LoginCard onSubmit={handleLogin} loading={loading} errors={errors} />
         </ScrollView>
       </KeyboardAvoidingView>
     </ImageBackground>

@@ -29,7 +29,7 @@ Requisitos funcionales: [`docs/requisitos.md`](../docs/requisitos.md)
    pnpm install
    ```
 
-2. Crear `frontend/.env` a partir de [`.env.example`](.env.example) y poner la IP de la PC donde corre el backend.
+2. (Opcional) Crear `frontend/.env` a partir de [`.env.example`](.env.example). En desarrollo no hace falta: la IP de la PC se detecta sola.
 
 3. Arrancar el backend (ver [`backend/README.md`](../backend/README.md)) y luego la app:
 
@@ -41,15 +41,19 @@ Requisitos funcionales: [`docs/requisitos.md`](../docs/requisitos.md)
 
 El teléfono y la PC tienen que estar en la misma red WiFi. Si no conecta, usar `pnpm start --tunnel`.
 
+Para generar el APK (backend desplegado, URL en EAS, comando de build): [`docs/build-apk.md`](docs/build-apk.md).
+
 ---
 
 ## Variables de entorno
 
 | Variable              | Ejemplo                     | Descripción                     |
 | --------------------- | --------------------------- | ------------------------------- |
-| `EXPO_PUBLIC_API_URL` | `http://192.168.1.50:3000`  | URL base de la API              |
+| `EXPO_PUBLIC_API_URL` | `https://tu-backend.com/api/v1` | **Opcional.** URL base de la API |
 
-- En el teléfono, `localhost` es el propio teléfono: hay que usar la **IP local de la PC** (`ipconfig`). Es la misma IP que muestra `pnpm start` en `exp://...`.
+- **En desarrollo no hace falta**: la app toma la IP de la PC desde Expo (la misma de `exp://<IP>:8081` al escanear el QR) y arma `http://<IP>:3000/api/v1`. Cambiar de WiFi no requiere tocar nada.
+- Definirla solo para apuntar a un backend desplegado, al usar `pnpm start --tunnel` (ahí la IP detectada es la del túnel de Metro) o para forzar una IP.
+- En el teléfono, `localhost` es el propio teléfono: si se fuerza una IP, debe ser la **IP local de la PC** (`ipconfig`).
 - Las variables `EXPO_PUBLIC_*` se incluyen en la app y cualquiera puede leerlas: nunca poner secretos ahí.
 - Después de cambiar `.env`, reiniciar con `pnpm start -c`.
 

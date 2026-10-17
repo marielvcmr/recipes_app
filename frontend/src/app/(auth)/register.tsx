@@ -1,5 +1,7 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import {
   ImageBackground,
   KeyboardAvoidingView,
@@ -10,12 +12,26 @@ import {
 } from 'react-native';
 
 import RegisterCard from '@/components/RegisterCard';
+import { useAuth } from '@/context/AuthContext';
 import { colors } from '@/styles/global';
+import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 export default function RegisterScreen() {
-  // TODO: llamar a POST /auth/register cuando exista src/api/auth.ts
-  const handleRegister = (username: string, email: string, password: string) => {
-    console.log({ username, email, password });
+  const { signUp } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>();
+
+  const handleRegister = async (username: string, email: string, password: string) => {
+    setLoading(true);
+    setErrors(undefined);
+    try {
+      await signUp(username, email, password);
+      router.replace('/profile');
+    } catch (error) {
+      setErrors(toFormErrors(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,7 +62,7 @@ export default function RegisterScreen() {
             />
           </View>
 
-          <RegisterCard onSubmit={handleRegister} />
+          <RegisterCard onSubmit={handleRegister} loading={loading} errors={errors} />
         </ScrollView>
       </KeyboardAvoidingView>
     </ImageBackground>

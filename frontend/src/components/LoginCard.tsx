@@ -5,13 +5,15 @@ import { StyleSheet, Text, View } from 'react-native';
 import Button from '@/components/Button';
 import TextField from '@/components/TextField';
 import { colors, fonts } from '@/styles/global';
+import type { FormErrors } from '@/utils/errors';
 
 type LoginCardProps = {
   onSubmit: (email: string, password: string) => void;
   loading?: boolean;
+  errors?: FormErrors;
 };
 
-export default function LoginCard({ onSubmit, loading = false }: LoginCardProps) {
+export default function LoginCard({ onSubmit, loading = false, errors }: LoginCardProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,6 +30,7 @@ export default function LoginCard({ onSubmit, loading = false }: LoginCardProps)
         autoCapitalize="none"
         autoComplete="email"
         textContentType="emailAddress"
+        error={errors?.fields.email}
       />
 
       <TextField
@@ -39,7 +42,10 @@ export default function LoginCard({ onSubmit, loading = false }: LoginCardProps)
         autoCapitalize="none"
         autoComplete="password"
         textContentType="password"
+        error={errors?.fields.password}
       />
+
+      {errors?.message && <Text style={styles.error}>{errors.message}</Text>}
 
       <View style={styles.buttonSpacing}>
         <Button title="Iniciar sesión" onPress={() => onSubmit(email, password)} loading={loading} />
@@ -68,6 +74,13 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34.5,
     letterSpacing: -0.6,
+  },
+  error: {
+    color: colors.error,
+    fontFamily: fonts.bold,
+    fontSize: 14,
+    lineHeight: 21,
+    textAlign: 'center',
   },
   buttonSpacing: {
     paddingTop: 6,

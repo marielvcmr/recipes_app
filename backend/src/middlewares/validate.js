@@ -1,8 +1,8 @@
 import { AppError } from '../utils/AppError.js';
 
-export function validate(schema) {
+export function validate(schema, source = "body") {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body ?? {});
+        const result = schema.safeParse(req[source] ?? {});
 
     if (!result.success) {
       const details = result.error.issues.map((issue) => ({
@@ -12,7 +12,11 @@ export function validate(schema) {
       return next(new AppError(400, 'VALIDATION_ERROR', 'Hay campos inválidos.', details));
     }
 
-    req.body = result.data;
+    if (source === 'query') {
+      req.validatedQuery = result.data;
+    } else {
+      req.body = result.data;
+    }
     next();
   };
 }

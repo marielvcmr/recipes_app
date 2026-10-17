@@ -1,8 +1,8 @@
-import { updateUser } from '../services/user.service.js';
-import { deleteUser } from '../services/user.service.js';
+import { updateUser, deleteUser, getUserCounts } from '../services/user.service.js';
 
 export async function getMe(req, res) {
-  res.json({ data: { user: req.user } });
+  const counts = await getUserCounts(req.user);
+  res.json({ data: { user: req.user, counts } });
 }
 
 export async function updateMe(req, res) {

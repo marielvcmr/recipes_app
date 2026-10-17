@@ -82,3 +82,33 @@ export async function renameGroup(ownerId, groupId, { name }) {
   await saveGroup(group);
   return withRecipeCount(group);
 }
+
+export async function addRecipesToGroup(ownerId, groupId, recipeIds) {
+  const group = await findOwnGroup(ownerId, groupId);
+  const recipes = await findOwnRecipes(ownerId, recipeIds);
+  await addRecipes(group, recipes);
+  return withRecipeCount(group);
+}
+
+export async function removeRecipeFromGroup(ownerId, groupId, recipeId) {
+  const group = await findOwnGroup(ownerId, groupId);
+  const recipe = await Recipe.findOne({ _id: recipeId, owner: ownerId });
+  if (!recipe || !recipe.removeFromGroup(group._id)) throw notFound();
+  await recipe.save();
+}
+
+export async function deleteGroup(ownerId, groupId) {
+  const group = await findOwnGroup(ownerId, groupId);
+  // Phase 4: also delete the images of these recipes from Cloudinary
+  await Recipe.deleteMany(activeIn(group._id));
+  await Recipe.updateMany(
+    { 'groups.group': group._id },
+    { $pull: { groups: { group: group._id } } },
+  );
+  await group.deleteOne();
+}
+
+export async function assertOwnGroups(ownerId, groupIds) {
+  const count = await Group.countDocuments({ _id: { $in: groupIds }, owner: ownerId });
+  if (count !== groupIds.length) throw notFound();
+}

@@ -2,6 +2,8 @@ import { Recipe } from '../models/recipe.model.js';
 import { AppError } from '../utils/AppError.js';
 import { normalizeName, escapeRegex } from '../utils/normalizer.js';
 import { assertOwnGroups } from './group.service.js';
+import { uploadImage, deleteImages } from './image.service.js';
+
 
 
 function numberSteps(steps) {
@@ -100,4 +102,24 @@ export function listPublicRecipes(userId, { excludeMine, ...pageOptions }) {
     filter.owner = { $ne: userId };
   }
   return findPage(filter, pageOptions);
+}
+
+export async function setRecipeImage(ownerId, recipeId, file) {
+  const recipe = await findOwnRecipe(ownerId, recipeId);
+  const { url, publicId } = await uploadImage(file.buffer);
+  const oldPublicId = recipe.imagePublicId;
+
+  recipe.set({ imageUrl: url, imagePublicId: publicId });
+  await recipe.save();
+  await deleteImages([oldPublicId]);
+  return recipe;
+}
+
+export async function removeRecipeImage(ownerId, recipeId) {
+  const recipe = await findOwnRecipe(ownerId, recipeId);
+  const oldPublicId = recipe.imagePublicId;
+
+  recipe.set({ imageUrl: null, imagePublicId: null });
+  await recipe.save();
+  await deleteImages([oldPublicId]);
 }

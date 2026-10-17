@@ -41,7 +41,8 @@ const recipeSchema = new mongoose.Schema(
     ingredients: [ingredientSchema],
     steps: [stepSchema],
     groups: [membershipSchema],
-
+    imageUrl: { type: String, default: null },
+    imagePublicId: { type: String, default: null },
   },
   {
     timestamps: true,
@@ -51,6 +52,7 @@ const recipeSchema = new mongoose.Schema(
         ret.id = ret._id;
         delete ret._id;
         delete ret.nameNormalized;
+        delete ret.imagePublicId;
         if (ret.groups) {
           ret.groupIds = ret.groups.filter((m) => m.isActive).map((m) => m.group);
           delete ret.groups;

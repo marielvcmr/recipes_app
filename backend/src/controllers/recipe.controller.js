@@ -1,4 +1,4 @@
-import { createRecipe, getRecipe, updateRecipe, deleteRecipe, listMyRecipes, listPublicRecipes} from '../services/recipe.service.js';
+import { createRecipe, getRecipe, updateRecipe, deleteRecipe, listMyRecipes, listPublicRecipes, setRecipeImage, removeRecipeImage} from '../services/recipe.service.js';
 
 export async function create(req, res) {
   const recipe = await createRecipe(req.user._id, req.body);
@@ -28,4 +28,14 @@ export async function listMine(req, res) {
 export async function feed(req, res) {
   const { recipes, meta } = await listPublicRecipes(req.user._id, req.validatedQuery);
   res.json({ data: recipes, meta });
+}
+
+export async function setImage(req, res) {
+  const recipe = await setRecipeImage(req.user._id, req.params.id, req.file);
+  res.json({ data: { recipe } });
+}
+
+export async function removeImage(req, res) {
+  await removeRecipeImage(req.user._id, req.params.id);
+  res.status(204).end();
 }

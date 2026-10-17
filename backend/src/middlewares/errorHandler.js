@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import multer from 'multer';
 import { AppError } from '../utils/AppError.js';
 
 const DUPLICATE_ERRORS = {
@@ -33,7 +34,12 @@ export function errorHandler(err, req, res, next) {
     if (duplicate) {
       error = new AppError(409, duplicate.code, duplicate.message);
     }
-  }
+  } else if (err instanceof multer.MulterError) {
+    error =
+    err.code === 'LIMIT_FILE_SIZE'
+      ? new AppError(413, 'FILE_TOO_LARGE', 'La imagen no puede superar 5 MB.')
+      : new AppError(400, 'VALIDATION_ERROR', 'Envía una sola imagen en el campo "image".');
+
 
   if (!(error instanceof AppError)) {
     console.error(err);

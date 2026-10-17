@@ -53,3 +53,31 @@ export const createRecipeSchema = z.object({
 export const updateRecipeSchema = createRecipeSchema
   .partial()
   .refine((data) => Object.keys(data).length > 0, 'Envía al menos un campo para actualizar.');
+
+  const listQuery = {
+  q: z.string().trim().max(50, 'La búsqueda no puede superar 50 caracteres.').optional(),
+  page: z.coerce
+    .number({ error: 'page debe ser un número.' })
+    .int('page debe ser un número entero.')
+    .min(1, 'page debe ser 1 o más.')
+    .default(1),
+  limit: z.coerce
+    .number({ error: 'limit debe ser un número.' })
+    .int('limit debe ser un número entero.')
+    .min(1, 'limit debe estar entre 1 y 50.')
+    .max(50, 'limit debe estar entre 1 y 50.')
+    .default(20),
+};
+
+export const listMineQuerySchema = z.object({
+  ...listQuery,
+  visibility: z.enum(['public', 'private'], { error: 'visibility debe ser public o private.' }).optional(),
+});
+
+export const feedQuerySchema = z.object({
+  ...listQuery,
+  excludeMine: z
+    .enum(['true', 'false'], { error: 'excludeMine debe ser true o false.' })
+    .optional()
+    .transform((value) => value === 'true'),
+});

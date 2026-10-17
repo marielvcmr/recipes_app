@@ -6,3 +6,7 @@ export function normalizeName(name) {
     .trim()
     .replace(/\s+/g, ' ');
 }
+
+export function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

@@ -12,7 +12,11 @@ export function validate(schema) {
       return next(new AppError(400, 'VALIDATION_ERROR', 'Hay campos inválidos.', details));
     }
 
-    req.body = result.data;
+    if (source === 'query') {
+      req.validatedQuery = result.data;
+    } else {
+      req.body = result.data;
+    }
     next();
   };
 }

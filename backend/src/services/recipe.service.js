@@ -1,5 +1,6 @@
 import { Recipe } from '../models/recipe.model.js';
 import { AppError } from '../utils/AppError.js';
+import { normalizeName, escapeRegex } from '../utils/normalizer.js';
 
 function numberSteps(steps) {
   return steps.map((step, index) => ({ position: index + 1, description: step.description }));
@@ -55,4 +56,36 @@ export async function deleteRecipe(ownerId, recipeId) {
   const recipe = await findOwnRecipe(ownerId, recipeId);
   // Phase 4: also delete its image from Cloudinary
   await recipe.deleteOne();
+}
+
+async function findPage(filter, { q, page, limit }) {
+  if (q) {
+    filter.nameNormalized = { $regex: escapeRegex(normalizeName(q)) };
+  }
+
+  const query = Recipe.find(filter)
+    .select('-ingredients -steps')
+    .populate('owner', 'username avatarColor')
+    .sort({ nameNormalized: 1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const [recipes, total] = await Promise.all([query, Recipe.countDocuments(filter)]);
+  return { recipes, meta: { page, limit, total } };
+}
+
+export function listMyRecipes(userId, { visibility, ...pageOptions }) {
+  const filter = { owner: userId };
+  if (visibility) {
+    filter.isPublic = visibility === 'public';
+  }
+  return findPage(filter, pageOptions);
+}
+
+export function listPublicRecipes(userId, { excludeMine, ...pageOptions }) {
+  const filter = { isPublic: true };
+  if (excludeMine) {
+    filter.owner = { $ne: userId };
+  }
+  return findPage(filter, pageOptions);
 }

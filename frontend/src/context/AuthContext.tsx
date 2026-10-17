@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type PropsWithChildren } from 'react';
 
 import * as authApi from '@/api/auth';
-import { ApiError, setAuthToken } from '@/api/client';
+import { ApiError, setAuthToken, setUnauthorizedHandler } from '@/api/client';
 import { getMe, updateMe, type ProfileChanges } from '@/api/users';
 import { deleteToken, getToken, saveToken } from '@/utils/token';
 import type { User } from '@/api/types';
@@ -72,6 +72,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setAuthToken(null);
     setUser(null);
   };
+
+  // Si cualquier petición responde 401 UNAUTHORIZED (token vencido o cuenta borrada), se vuelve al login
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      setAuthToken(null);
+      setUser(null);
+      deleteToken();
+    });
+    return () => setUnauthorizedHandler(null);
+  }, []);
 
   // Guarda en el backend y actualiza el usuario de toda la app (avatar, nombre…)
   const updateProfile = async (changes: ProfileChanges) => {

@@ -7,10 +7,21 @@ export type FormErrors = {
   fields: Record<string, string>;
 };
 
+const DUPLICATE_FIELDS: Record<string, string> = {
+  EMAIL_TAKEN: 'email',
+  USERNAME_TAKEN: 'username',
+};
+
 // Convierte cualquier error de una petición en mensajes listos para mostrar en un formulario
 export function toFormErrors(error: unknown): FormErrors {
   if (!(error instanceof ApiError)) {
     return { message: 'Error inesperado.', fields: {} };
+  }
+
+  // Correo o usuario ya registrados (409): el error va debajo de su campo
+  const duplicateField = DUPLICATE_FIELDS[error.code];
+  if (duplicateField) {
+    return { fields: { [duplicateField]: error.message } };
   }
 
   const fields: Record<string, string> = {};

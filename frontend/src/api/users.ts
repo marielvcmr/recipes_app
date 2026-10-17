@@ -3,7 +3,7 @@ import type { User } from '@/api/types';
 
 export type MeResponse = {
   user: User;
-  counts: { recipes: number };
+  counts: { recipes: number; groups: number };
 };
 
 // GET /users/me (requiere token)

@@ -5,7 +5,6 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ApiError } from '@/api/client';
-import { listGroups } from '@/api/groups';
 import { deleteMe, getMe, type ProfileChanges } from '@/api/users';
 import BottomSheet from '@/components/BottomSheet';
 import EditCard from '@/components/EditCard';
@@ -59,9 +58,8 @@ export default function ProfileScreen() {
   // Se recargan al volver a la pestaña, por si se crearon recetas o grupos
   useFocusEffect(
     useCallback(() => {
-      // /users/me solo cuenta recetas; los grupos salen del total de GET /groups
-      Promise.all([getMe(), listGroups(1, 1)])
-        .then(([me, groups]) => setCounts({ recipes: me.counts.recipes, groups: groups.meta.total }))
+      getMe()
+        .then((me) => setCounts(me.counts))
         .catch(() => {});
     }, []),
   );
@@ -69,7 +67,7 @@ export default function ProfileScreen() {
   const handleDeleteAccount = () => {
     Alert.alert(
       'Eliminar cuenta',
-      'Se borrarán tu cuenta y todas tus recetas. Esta acción no se puede deshacer.',
+      'Se borrarán tu cuenta, tus recetas y tus grupos. Esta acción no se puede deshacer.',
       [
         { text: 'Cancelar', style: 'cancel' },
         {

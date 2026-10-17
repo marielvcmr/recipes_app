@@ -44,6 +44,13 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
+// AuthContext registra aquí qué hacer si el token deja de valer (vencido o cuenta borrada): cerrar sesión
+let onUnauthorized: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  onUnauthorized = handler;
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   body?: unknown;
@@ -86,6 +93,12 @@ async function request<T>(path: string, { method = 'GET', body }: RequestOptions
 
   if (!response.ok) {
     const error = (json as ApiErrorBody | null)?.error;
+
+    // Solo UNAUTHORIZED con token: una clave mala en el login es INVALID_CREDENTIALS y no cierra nada
+    if (response.status === 401 && error?.code === 'UNAUTHORIZED' && authToken) {
+      onUnauthorized?.();
+    }
+
     throw new ApiError(
       response.status,
       error?.code ?? 'INTERNAL_ERROR',

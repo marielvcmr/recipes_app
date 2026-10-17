@@ -50,4 +50,4 @@ export function errorHandler(err, req, res, next) {
   if (error.details) body.error.details = error.details;
 
   res.status(error.status).json(body);
-}
+  }

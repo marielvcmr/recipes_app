@@ -68,9 +68,10 @@ export async function updateRecipe(ownerId, recipeId, { groupIds, ...changes }) 
 
 export async function deleteRecipe(ownerId, recipeId) {
   const recipe = await findOwnRecipe(ownerId, recipeId);
-  // Phase 4: also delete its image from Cloudinary
   await recipe.deleteOne();
+  await deleteImages([recipe.imagePublicId]);
 }
+
 
 async function findPage(filter, { q, page, limit }) {
   if (q) {

@@ -39,7 +39,7 @@ export function errorHandler(err, req, res, next) {
     err.code === 'LIMIT_FILE_SIZE'
       ? new AppError(413, 'FILE_TOO_LARGE', 'La imagen no puede superar 5 MB.')
       : new AppError(400, 'VALIDATION_ERROR', 'Envía una sola imagen en el campo "image".');
-
+  }  
 
   if (!(error instanceof AppError)) {
     console.error(err);
@@ -50,4 +50,4 @@ export function errorHandler(err, req, res, next) {
   if (error.details) body.error.details = error.details;
 
   res.status(error.status).json(body);
-}
+  }

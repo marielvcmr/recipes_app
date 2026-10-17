@@ -7,17 +7,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ApiError } from '@/api/client';
 import { deleteMe, getMe, type ProfileChanges } from '@/api/users';
 import BottomSheet from '@/components/BottomSheet';
+import GlassBackground from '@/components/GlassBackground';
 import EditCard from '@/components/EditCard';
 import ProfileBrief from '@/components/ProfileBrief';
 import ProfileIcon from '@/components/ProfileIcon';
 import ProfileOptionsMenu from '@/components/ProfileOptionsMenu';
+import ScreenTitle from '@/components/ScreenTitle';
 import { useAuth } from '@/context/AuthContext';
-import { colors, fonts } from '@/styles/global';
+import { useTabBarHeight } from '@/hooks/useTabBarHeight';
+import { colors, fonts, glass, glassSurface } from '@/styles/global';
 import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 export default function ProfileScreen() {
   const { user, signOut, updateProfile } = useAuth();
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
   const [counts, setCounts] = useState({ recipes: 0, groups: 0 });
 
   const [editing, setEditing] = useState(false);
@@ -90,54 +94,52 @@ export default function ProfileScreen() {
   if (!user) return null;
 
   return (
-    <ScrollView
-      style={styles.screen}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 45 }]}
-    >
-      <Text style={styles.title}>
-        Mi <Text style={styles.titleAccent}>perfil</Text>
-      </Text>
+    <View style={styles.screen}>
+      <GlassBackground />
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 45, paddingBottom: tabBarHeight + 32 }]}>
+        <ScreenTitle lead="Mi" accent="perfil" />
 
-      <View style={styles.header}>
-        <ProfileIcon name={user.username} color={user.avatarColor} />
-        <Text style={styles.name}>{user.username}</Text>
+        <View style={styles.header}>
+          <ProfileIcon name={user.username} color={user.avatarColor} />
+          <Text style={styles.name}>{user.username}</Text>
 
-        <Pressable
-          onPress={openEdit}
-          accessibilityRole="button"
-          style={({ pressed }) => [styles.editButton, pressed && styles.pressed]}
-        >
-          <Image
-            source={require('@/assets/images/profile/edit.svg')}
-            style={styles.editIcon}
-            contentFit="contain"
-          />
-          <Text style={styles.editLabel}>Editar perfil</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            onPress={openEdit}
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.editButton, pressed && styles.pressed]}
+          >
+            <Image
+              source={require('@/assets/images/profile/edit.svg')}
+              style={styles.editIcon}
+              contentFit="contain"
+            />
+            <Text style={styles.editLabel}>Editar perfil</Text>
+          </Pressable>
+        </View>
 
-      <ProfileBrief
-        recipes={counts.recipes}
-        groups={counts.groups}
-        onPressRecipes={() => router.navigate('/my-recipes')}
-        onPressGroups={() => router.navigate('/groups')}
-      />
-
-      <View style={styles.menu}>
-        <ProfileOptionsMenu onSignOut={signOut} onDeleteAccount={handleDeleteAccount} />
-      </View>
-
-      <BottomSheet visible={editing} onClose={closeEdit}>
-        <EditCard
-          key={editKey}
-          user={user}
-          onSubmit={handleSave}
-          onClose={closeEdit}
-          loading={saving}
-          errors={editErrors}
+        <ProfileBrief
+          recipes={counts.recipes}
+          groups={counts.groups}
+          onPressRecipes={() => router.navigate('/my-recipes')}
+          onPressGroups={() => router.navigate('/groups')}
         />
-      </BottomSheet>
-    </ScrollView>
+
+        <View style={styles.menu}>
+          <ProfileOptionsMenu onSignOut={signOut} onDeleteAccount={handleDeleteAccount} />
+        </View>
+
+        <BottomSheet visible={editing} onClose={closeEdit}>
+          <EditCard
+            key={editKey}
+            user={user}
+            onSubmit={handleSave}
+            onClose={closeEdit}
+            loading={saving}
+            errors={editErrors}
+          />
+        </BottomSheet>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -148,18 +150,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 22,
-    paddingBottom: 32,
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fonts.heading,
-    fontSize: 34,
-    lineHeight: 36.72,
-    letterSpacing: -0.68,
-  },
-  titleAccent: {
-    color: colors.primary,
-    fontFamily: fonts.headingItalic,
   },
   header: {
     alignItems: 'center',
@@ -181,9 +171,8 @@ const styles = StyleSheet.create({
     gap: 7,
     minHeight: 44,
     paddingHorizontal: 16,
-    backgroundColor: colors.white,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassSurface,
+    backgroundColor: glass.fillStrong,
     borderRadius: 12,
   },
   pressed: {

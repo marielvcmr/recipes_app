@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useBlurTarget } from '@/context/BlurTargetContext';
-import { colors } from '@/styles/global';
+import { colors, glass } from '@/styles/global';
 
 type BottomSheetProps = PropsWithChildren<{
   visible: boolean;
@@ -163,10 +163,14 @@ const styles = StyleSheet.create({
   },
   sheet: {
     maxHeight: '90%',
-    backgroundColor: colors.surface,
+    backgroundColor: glass.sheet,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
-    boxShadow: '0px -15px 50px rgba(0, 0, 0, 0.14)',
+    borderTopWidth: 1.2,
+    borderLeftWidth: 1.2,
+    borderRightWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.75)',
+    boxShadow: '0px -15px 50px rgba(0, 0, 0, 0.14), inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
     overflow: 'hidden',
   },
   handleArea: {

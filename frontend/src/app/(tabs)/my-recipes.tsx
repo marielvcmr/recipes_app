@@ -18,6 +18,7 @@ import type { Group, Recipe, RecipeSummary } from '@/api/types';
 import AddRecipeButton from '@/components/AddRecipeButton';
 import AlphabetIndex from '@/components/AlphabetIndex';
 import BottomSheet from '@/components/BottomSheet';
+import GlassBackground from '@/components/GlassBackground';
 import RecipeCard from '@/components/RecipeCard';
 import RecipeForm, { type RecipeFormValues } from '@/components/RecipeForm';
 import RecipeView from '@/components/RecipeView';
@@ -25,11 +26,14 @@ import ScreenHeader from '@/components/ScreenHeader';
 import SearchBar from '@/components/SearchBar';
 import SegmentedRecipeTab, { type VisibilityFilter } from '@/components/SegmentedRecipeTab';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useTabBarHeight } from '@/hooks/useTabBarHeight';
 import { colors, fonts } from '@/styles/global';
 import { initialOf } from '@/utils/alphabet';
 import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 const PAGE_SIZE = 20;
+// Espacio libre al final de la lista, además del alto de la barra de pestañas (para que el botón + no tape la última receta)
+const CONTENT_BOTTOM = 90;
 
 type Section = { title: string; data: RecipeSummary[] };
 
@@ -53,6 +57,7 @@ type Sheet = { mode: 'closed' } | { mode: 'view'; id: string } | { mode: 'form';
 
 export default function MyRecipesScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
 
   // Búsqueda y filtro
   const [search, setSearch] = useState('');
@@ -191,9 +196,9 @@ export default function MyRecipesScreen() {
     }
   };
 
-  const handleDelete = () => {
-    if (!viewed) return;
-    Alert.alert('Eliminar receta', `Se borrará "${viewed.name}" y se quitará de tus grupos. No se puede deshacer.`, [
+  // Se usa desde la receta abierta y desde la papelera de cada tarjeta
+  const confirmDelete = (recipe: { id: string; name: string }) => {
+    Alert.alert('Eliminar receta', `Se borrará "${recipe.name}" y se quitará de tus grupos. No se puede deshacer.`, [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Eliminar',
@@ -201,7 +206,7 @@ export default function MyRecipesScreen() {
         onPress: async () => {
           setDeleting(true);
           try {
-            await deleteRecipe(viewed.id);
+            await deleteRecipe(recipe.id);
             setSheet({ mode: 'closed' });
             loadPage(1);
           } catch (error) {
@@ -254,11 +259,14 @@ export default function MyRecipesScreen() {
 
   return (
     <View style={styles.screen}>
+      <GlassBackground />
       <SectionList
         ref={listRef}
         sections={sections}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <RecipeCard recipe={item} onPress={() => openRecipe(item.id)} />}
+        renderItem={({ item }) => (
+          <RecipeCard recipe={item} onPress={() => openRecipe(item.id)} onDelete={() => confirmDelete(item)} />
+        )}
         renderSectionHeader={({ section }) => (
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionLetter}>{section.title}</Text>
@@ -279,11 +287,11 @@ export default function MyRecipesScreen() {
           if (sectionIndex !== null) setTimeout(() => scrollToSection(sectionIndex), 50);
         }}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27, paddingBottom: tabBarHeight + CONTENT_BOTTOM }]}
       />
 
       {sections.length > 0 && (
-        <View style={[styles.index, { top: insets.top }]} pointerEvents="box-none">
+        <View style={[styles.index, { top: insets.top, bottom: tabBarHeight }]} pointerEvents="box-none">
           <AlphabetIndex available={letters} onSelect={jumpToLetter} />
         </View>
       )}
@@ -298,7 +306,7 @@ export default function MyRecipesScreen() {
             error={viewError}
             onClose={closeSheet}
             onEdit={() => viewed && openForm(viewed)}
-            onDelete={handleDelete}
+            onDelete={() => viewed && confirmDelete(viewed)}
             deleting={deleting}
           />
         )}
@@ -327,12 +335,9 @@ const styles = StyleSheet.create({
   index: {
     position: 'absolute',
     left: 2,
-    bottom: 0,
   },
   content: {
     paddingHorizontal: 22,
-    // Espacio para que el botón + no tape la última receta
-    paddingBottom: 90,
   },
   headerBlock: {
     paddingBottom: 8,

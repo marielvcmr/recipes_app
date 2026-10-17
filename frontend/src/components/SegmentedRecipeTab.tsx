@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassSurface } from '@/styles/global';
 
 // undefined = Todas (GET /recipes/mine sin filtro de visibilidad)
 export type VisibilityFilter = 'public' | 'private' | undefined;
@@ -42,9 +42,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 7,
     padding: 4,
-    backgroundColor: colors.segmentBg,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassSurface,
+    boxShadow: glass.shadowSmall,
     borderRadius: 13,
   },
   tab: {
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     backgroundColor: colors.white,
-    boxShadow: '0px 3px 5px rgba(49, 42, 31, 0.08)',
+    boxShadow: '0px 3px 8px rgba(84, 62, 40, 0.1), inset 0px 1px 0px rgba(255, 255, 255, 1)',
   },
   label: {
     color: colors.textMuted,

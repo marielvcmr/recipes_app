@@ -11,7 +11,7 @@ import {
   type TextStyle,
 } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glassInput } from '@/styles/global';
 
 type TextFieldProps = TextInputProps & {
   label: string;
@@ -81,10 +81,8 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 50,
     paddingHorizontal: 14,
-    borderWidth: 1.2,
-    borderColor: colors.border,
     borderRadius: 12,
-    backgroundColor: colors.input,
+    ...glassInput,
     color: colors.text,
     fontFamily: fonts.bold,
     fontSize: 16,

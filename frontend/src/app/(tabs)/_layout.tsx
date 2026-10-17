@@ -1,9 +1,11 @@
 import { Image, type ImageSource } from 'expo-image';
+import { BlurView } from 'expo-blur';
 import { Tabs } from 'expo-router';
-import { StyleSheet, Text, type ColorValue } from 'react-native';
+import { Platform, StyleSheet, Text, View, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, fonts } from '@/styles/global';
+import { useTabBarHeight } from '@/hooks/useTabBarHeight';
+import { colors, fonts, glass } from '@/styles/global';
 
 // Los íconos vienen en gris del Figma; tintColor los pinta del color de la pestaña
 function tabIcon(source: ImageSource | number) {
@@ -30,8 +32,20 @@ function TabLabel({
   );
 }
 
+// Fondo de vidrio de la barra: en iOS desenfoca lo que pasa por debajo; en Android (donde el desenfoque
+// no puede apuntar a la misma vista que lo contiene) queda como vidrio translúcido sin desenfoque
+function TabBarGlass() {
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      {Platform.OS === 'ios' && <BlurView style={StyleSheet.absoluteFill} intensity={40} tint="light" />}
+      <View style={[StyleSheet.absoluteFill, styles.glass]} />
+    </View>
+  );
+}
+
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const height = useTabBarHeight();
 
   return (
     <Tabs
@@ -40,7 +54,8 @@ export default function TabsLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabInactive,
         tabBarLabel: TabLabel,
-        tabBarStyle: [styles.bar, { height: 72 + insets.bottom, paddingBottom: insets.bottom }],
+        tabBarStyle: [styles.bar, { height, paddingBottom: insets.bottom }],
+        tabBarBackground: TabBarGlass,
         tabBarItemStyle: styles.item,
       }}
     >
@@ -68,11 +83,21 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
+  // Flota sobre el contenido: las listas se ven pasar por detrás del vidrio
   bar: {
-    backgroundColor: colors.tabBar,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
     borderTopWidth: 1.2,
-    borderTopColor: colors.border,
+    borderTopColor: 'rgba(255, 255, 255, 0.8)',
     elevation: 0,
+    boxShadow: '0px -6px 20px rgba(84, 62, 40, 0.06)',
+  },
+  glass: {
+    backgroundColor: Platform.OS === 'ios' ? glass.tabBarBlur : glass.tabBar,
+    boxShadow: 'inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
   },
   item: {
     paddingTop: 13,

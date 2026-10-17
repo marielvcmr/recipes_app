@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import type { Recipe } from '@/api/types';
 import ProfileIcon from '@/components/ProfileIcon';
 import RecipeImage from '@/components/RecipeImage';
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassInput, glassSurface } from '@/styles/global';
 import { difficultyLabel } from '@/utils/recipeOptions';
 
 type RecipeViewProps = {
@@ -170,7 +170,10 @@ const styles = StyleSheet.create({
     borderRadius: 19.5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: glass.onPhoto,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.65)',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15), inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
   },
   closeIcon: {
     width: 22,
@@ -233,9 +236,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.heading,
     fontSize: 21,
   },
+  // Ingredientes y pasos van en paneles de vidrio
   list: {
+    ...glassSurface,
     gap: 11,
-    paddingTop: 13,
+    marginTop: 13,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    borderRadius: 16,
   },
   ingredient: {
     flexDirection: 'row',
@@ -268,6 +276,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.badge,
+    boxShadow: 'inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
   },
   stepNumberText: {
     color: colors.primary,
@@ -296,12 +305,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   editAction: {
-    backgroundColor: colors.white,
-    borderColor: colors.border,
+    ...glassInput,
+    boxShadow: glass.shadowSmall,
   },
   deleteAction: {
-    backgroundColor: colors.dangerSoft,
+    backgroundColor: glass.danger,
     borderColor: colors.dangerBorder,
+    boxShadow: glass.shadowSmall,
   },
   actionIcon: {
     width: 17,

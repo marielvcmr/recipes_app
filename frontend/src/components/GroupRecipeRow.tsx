@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { GroupRecipe } from '@/api/types';
 import RecipeImage from '@/components/RecipeImage';
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassSurface } from '@/styles/global';
 import { timeAndDifficulty } from '@/utils/recipeOptions';
 
 type GroupRecipeRowProps = {
@@ -50,10 +50,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingRight: 8,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassSurface,
+    backgroundColor: glass.fillStrong,
     borderRadius: 14,
-    backgroundColor: colors.white,
     overflow: 'hidden',
   },
   main: {

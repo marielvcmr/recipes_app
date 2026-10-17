@@ -1,7 +1,7 @@
 import { Image, type ImageSource } from 'expo-image';
 import { Pressable, StyleSheet } from 'react-native';
 
-import { colors } from '@/styles/global';
+import { colors, glass, glassCircle } from '@/styles/global';
 
 type IconButtonProps = {
   icon: ImageSource | number;
@@ -45,10 +45,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.closeButton,
+    ...glassCircle,
   },
   danger: {
-    backgroundColor: colors.dangerButton,
+    backgroundColor: glass.danger,
+    borderColor: colors.dangerBorder,
   },
   pressed: {
     opacity: 0.7,

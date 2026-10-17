@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import ProfileIcon from '@/components/ProfileIcon';
 import ScreenTitle from '@/components/ScreenTitle';
 import { useAuth } from '@/context/AuthContext';
+import { glassCircle } from '@/styles/global';
 
 type ScreenHeaderProps = {
   lead: string;
@@ -29,7 +30,9 @@ export default function ScreenHeader({ lead, accent }: ScreenHeaderProps) {
             hitSlop={10}
             style={({ pressed }) => pressed && styles.pressed}
           >
-            <ProfileIcon name={user.username} color={user.avatarColor} size={42} />
+            <View style={styles.avatarRing}>
+              <ProfileIcon name={user.username} color={user.avatarColor} size={42} />
+            </View>
           </Pressable>
         </Link>
       )}
@@ -49,5 +52,11 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.75,
+  },
+  // Anillo de vidrio alrededor del avatar
+  avatarRing: {
+    ...glassCircle,
+    padding: 3,
+    borderRadius: 26,
   },
 });

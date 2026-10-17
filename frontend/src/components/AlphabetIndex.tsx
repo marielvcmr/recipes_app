@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { StyleSheet, Text, View, type GestureResponderEvent } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, primaryGradient } from '@/styles/global';
 import { INDEX_LETTERS } from '@/utils/alphabet';
 
 // Alto de cada letra: se ajusta al alto disponible de la pantalla, dentro de estos límites
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.white,
-    boxShadow: '0px 1.5px 2.5px rgba(205, 98, 73, 0.38)',
+    boxShadow: '0px 1.5px 2.5px rgba(205, 98, 73, 0.38), inset 0px 1px 0px rgba(255, 255, 255, 1)',
   },
   cardOff: {
     backgroundColor: colors.indexCardOff,
@@ -159,7 +159,8 @@ const styles = StyleSheet.create({
   },
   cardActive: {
     backgroundColor: colors.primary,
-    boxShadow: '0px 2px 5px rgba(205, 98, 73, 0.55)',
+    experimental_backgroundImage: primaryGradient,
+    boxShadow: '0px 2px 5px rgba(205, 98, 73, 0.55), inset 0px 1px 0px rgba(255, 255, 255, 0.35)',
     transform: [{ scale: 1.15 }],
   },
   letter: {
@@ -184,7 +185,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
-    boxShadow: '0px 6px 14px rgba(173, 72, 52, 0.3)',
+    experimental_backgroundImage: primaryGradient,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    boxShadow: '0px 6px 14px rgba(173, 72, 52, 0.3), inset 0px 1px 0px rgba(255, 255, 255, 0.4)',
   },
   bubbleText: {
     color: colors.white,

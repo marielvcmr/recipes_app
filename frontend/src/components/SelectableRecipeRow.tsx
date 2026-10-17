@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { RecipeSummary } from '@/api/types';
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glassInput } from '@/styles/global';
 import { timeAndDifficulty } from '@/utils/recipeOptions';
 
 type SelectableRecipeRowProps = {
@@ -43,10 +43,8 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingHorizontal: 12,
     paddingVertical: 11,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassInput,
     borderRadius: 12,
-    backgroundColor: colors.white,
   },
   pressed: {
     opacity: 0.7,

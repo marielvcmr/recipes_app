@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassCircle } from '@/styles/global';
 
 // Primera tarjeta de la grilla de grupos: abre el formulario "Nuevo grupo"
 export default function NewGroupTile({ onPress }: { onPress: () => void }) {
@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: colors.dashed,
     borderRadius: 19,
+    backgroundColor: glass.fill,
   },
   pressed: {
     opacity: 0.7,
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.closeButton,
+    ...glassCircle,
   },
   icon: {
     width: 22,

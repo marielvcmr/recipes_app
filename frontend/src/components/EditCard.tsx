@@ -7,7 +7,7 @@ import type { ProfileChanges } from '@/api/users';
 import Button from '@/components/Button';
 import ColorPicker from '@/components/ColorPicker';
 import TextField from '@/components/TextField';
-import { avatarColors, colors, fonts } from '@/styles/global';
+import { avatarColors, colors, fonts, glassCircle } from '@/styles/global';
 import type { FormErrors } from '@/utils/errors';
 
 type EditCardProps = {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.closeButton,
+    ...glassCircle,
     alignItems: 'center',
     justifyContent: 'center',
   },

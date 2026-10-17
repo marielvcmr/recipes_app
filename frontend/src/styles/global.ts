@@ -55,3 +55,55 @@ export const fonts = {
   regular: 'DMSans_400Regular',
   bold: 'DMSans_700Bold',
 };
+
+// --- Glassmorfismo ---
+// Superficies de vidrio esmerilado: blanco translúcido, un borde fino cálido, sombra suave y un brillo
+// arriba (sombra interior blanca). Lucen sobre <GlassBackground />, que pone manchas de color detrás.
+export const glass = {
+  // Tarjetas y paneles
+  fill: 'rgba(255, 255, 255, 0.6)',
+  // Campos de texto, buscadores y tarjetas que deben leerse mejor
+  fillStrong: 'rgba(255, 255, 255, 0.78)',
+  // Hojas inferiores (BottomSheet): casi opacas para que el texto se lea sobre el fondo desenfocado
+  sheet: 'rgba(251, 250, 246, 0.9)',
+  // Botones redondos sobre fotos (cerrar en la receta)
+  onPhoto: 'rgba(255, 255, 255, 0.7)',
+  // Lista abierta de un dropdown: casi opaca para leer bien las opciones
+  menu: 'rgba(255, 255, 255, 0.96)',
+  // Barra de pestañas flotante: más translúcida donde hay desenfoque (iOS) que donde no (Android)
+  tabBarBlur: 'rgba(251, 250, 246, 0.55)',
+  tabBar: 'rgba(251, 250, 246, 0.8)',
+  // Botones de borrar (rojo muy suave translúcido)
+  danger: 'rgba(253, 236, 232, 0.82)',
+  edge: 'rgba(214, 204, 188, 0.55)',
+  shadow: '0px 8px 22px rgba(84, 62, 40, 0.07), inset 0px 1px 0px rgba(255, 255, 255, 0.95)',
+  shadowSmall: '0px 3px 10px rgba(84, 62, 40, 0.06), inset 0px 1px 0px rgba(255, 255, 255, 0.95)',
+  inputShadow: '0px 2px 6px rgba(84, 62, 40, 0.04), inset 0px 1px 0px rgba(255, 255, 255, 0.9)',
+};
+
+// Estilo base para spread: { ...glassSurface, borderRadius: 16 }
+export const glassSurface = {
+  backgroundColor: glass.fill,
+  borderWidth: 1.2,
+  borderColor: glass.edge,
+  boxShadow: glass.shadow,
+} as const;
+
+// Campos de texto, selects y buscadores
+export const glassInput = {
+  backgroundColor: glass.fillStrong,
+  borderWidth: 1.2,
+  borderColor: glass.edge,
+  boxShadow: glass.inputShadow,
+} as const;
+
+// Botones redondos (cerrar, volver, editar)
+export const glassCircle = {
+  backgroundColor: glass.fillStrong,
+  borderWidth: 1.2,
+  borderColor: glass.edge,
+  boxShadow: glass.shadowSmall,
+} as const;
+
+// Botón principal: degradado coral con brillo arriba
+export const primaryGradient = 'linear-gradient(180deg, #da7860 0%, #c75b42 100%)';

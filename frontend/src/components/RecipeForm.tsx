@@ -9,7 +9,7 @@ import FormErrorSummary from '@/components/FormErrorSummary';
 import RecipeImage from '@/components/RecipeImage';
 import Select from '@/components/Select';
 import TextField from '@/components/TextField';
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassCircle, glassInput } from '@/styles/global';
 import type { FormErrors } from '@/utils/errors';
 import { pickRecipeImage, type ImageSourceKind } from '@/utils/pickImage';
 import {
@@ -41,6 +41,8 @@ type RecipeFormProps = {
 };
 
 const DESCRIPTION_MAX = 200;
+// Título: el mismo máximo que el backend, para que quepa en 2 líneas de la tarjeta sin "…"
+const NAME_MAX = 35;
 const STEP_MAX = 300;
 
 // Cada fila necesita una key estable para que React no mezcle los inputs al borrar una del medio
@@ -212,7 +214,7 @@ export default function RecipeForm({ recipe, groups, onSubmit, onClose, loading 
         placeholder="Ej. Sopa de tomate"
         value={name}
         onChangeText={setName}
-        maxLength={50}
+        maxLength={NAME_MAX}
         error={fields.name}
       />
 
@@ -482,7 +484,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.closeButton,
+    ...glassCircle,
   },
   closeIcon: {
     width: 22,
@@ -514,9 +516,7 @@ const styles = StyleSheet.create({
   textArea: {
     paddingHorizontal: 13,
     paddingVertical: 12,
-    backgroundColor: colors.input,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassInput,
     borderRadius: 12,
     color: colors.text,
     fontSize: 16,
@@ -565,9 +565,7 @@ const styles = StyleSheet.create({
     minHeight: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassInput,
     borderRadius: 12,
   },
   photoActionText: {
@@ -583,7 +581,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 4,
-    backgroundColor: colors.white,
+    backgroundColor: glass.fill,
     borderWidth: 1.2,
     borderStyle: 'dashed',
     borderColor: colors.border,
@@ -638,9 +636,7 @@ const styles = StyleSheet.create({
   smallInput: {
     height: 45,
     paddingHorizontal: 9,
-    backgroundColor: colors.input,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassInput,
     borderRadius: 12,
     color: colors.text,
     fontFamily: fonts.regular,

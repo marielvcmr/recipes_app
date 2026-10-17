@@ -16,17 +16,21 @@ import {
 import { getRecipe } from '@/api/recipes';
 import type { Group, GroupDetail, GroupRecipe, Recipe } from '@/api/types';
 import BottomSheet from '@/components/BottomSheet';
+import GlassBackground from '@/components/GlassBackground';
 import GroupForm, { type GroupFormValues } from '@/components/GroupForm';
 import GroupGrid from '@/components/GroupGrid';
 import GroupView from '@/components/GroupView';
 import RecipeView from '@/components/RecipeView';
-import ScreenTitle from '@/components/ScreenTitle';
+import ScreenHeader from '@/components/ScreenHeader';
 import SearchBar from '@/components/SearchBar';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useTabBarHeight } from '@/hooks/useTabBarHeight';
 import { colors, fonts } from '@/styles/global';
 import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 const PAGE_SIZE = 20;
+// Espacio libre al final de la lista, además del alto de la barra de pestañas
+const CONTENT_BOTTOM = 40;
 
 function errorMessage(error: unknown) {
   return error instanceof ApiError ? error.message : 'Error inesperado.';
@@ -42,6 +46,7 @@ type Sheet =
 
 export default function GroupsScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
 
   // Búsqueda
   const [search, setSearch] = useState('');
@@ -226,7 +231,7 @@ export default function GroupsScreen() {
 
   const header = (
     <View style={styles.headerBlock}>
-      <ScreenTitle lead="Tus" accent="grupos" />
+      <ScreenHeader lead="Tus" accent="grupos" />
       <Text style={styles.intro}>
         Organiza y clasifica tus recetas en uno o varios grupos para encontrar lo que necesitas en cada ocasión.
       </Text>
@@ -259,6 +264,7 @@ export default function GroupsScreen() {
 
   return (
     <View style={styles.screen}>
+      <GlassBackground />
       <GroupGrid
         groups={groups}
         onCreate={() => openForm()}
@@ -266,7 +272,7 @@ export default function GroupsScreen() {
         header={header}
         footer={footer}
         onEndReached={loadMore}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27, paddingBottom: tabBarHeight + CONTENT_BOTTOM }]}
       />
 
       <BottomSheet visible={sheet.mode !== 'closed'} onClose={closeSheet}>
@@ -318,7 +324,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 22,
-    paddingBottom: 40,
   },
   headerBlock: {
     paddingBottom: 24,

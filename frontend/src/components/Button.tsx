@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, primaryGradient } from '@/styles/global';
 
 type ButtonProps = {
   title: string;
@@ -33,10 +33,13 @@ const styles = StyleSheet.create({
     minHeight: 50,
     borderRadius: 13,
     backgroundColor: colors.primary,
+    experimental_backgroundImage: primaryGradient,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
-    boxShadow: '0px 7px 7.5px rgba(173, 72, 52, 0.18)',
+    boxShadow: '0px 8px 16px rgba(173, 72, 52, 0.22), inset 0px 1px 0px rgba(255, 255, 255, 0.35)',
   },
   dimmed: {
     opacity: 0.7,

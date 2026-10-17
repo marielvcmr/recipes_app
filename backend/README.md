@@ -195,7 +195,7 @@ Ningún campo obligatorio puede quedar vacío (se aplica `trim`). Cada campo tie
 
 | Campo                    | Obligatorio | Reglas |
 | ------------------------ | ----------- | ------ |
-| `name`                   | Sí          | 2–50 caracteres. Único por usuario. |
+| `name`                   | Sí          | 2–35 caracteres (cabe en 2 líneas de la tarjeta). Único por usuario. |
 | `description`            | Sí          | 10–200 caracteres. |
 | `timeMinutes`            | Sí          | Entero, 1–1440. |
 | `difficulty`             | Sí          | `facil` \| `media` \| `dificil` |

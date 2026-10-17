@@ -1,7 +1,7 @@
 import { Image, type ImageSource } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass } from '@/styles/global';
 
 type ProfileOptionProps = {
   icon: ImageSource | number;
@@ -49,10 +49,10 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomWidth: 1.2,
-    borderBottomColor: colors.border,
+    borderBottomColor: glass.edge,
   },
   pressed: {
-    backgroundColor: colors.surface,
+    backgroundColor: glass.fillStrong,
   },
   content: {
     flexDirection: 'row',

@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassInput } from '@/styles/global';
 
 type SearchBarProps = {
   value: string;
@@ -36,11 +36,9 @@ const styles = StyleSheet.create({
     gap: 10,
     height: 50,
     paddingHorizontal: 14,
-    backgroundColor: colors.white,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassInput,
     borderRadius: 15,
-    boxShadow: '0px 4px 9px rgba(43, 38, 30, 0.04)',
+    boxShadow: glass.shadowSmall,
   },
   icon: {
     width: 20,

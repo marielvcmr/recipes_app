@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { colors, fonts } from '@/styles/global';
+import { colors, fonts, glass, glassSurface } from '@/styles/global';
 
 type ProfileBriefProps = {
   recipes: number;
@@ -44,9 +44,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     overflow: 'hidden',
-    backgroundColor: colors.white,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassSurface,
     borderRadius: 17,
   },
   stat: {
@@ -55,11 +53,11 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   pressed: {
-    backgroundColor: colors.segmentBg,
+    backgroundColor: glass.fillStrong,
   },
   divider: {
     borderRightWidth: 1.2,
-    borderRightColor: colors.border,
+    borderRightColor: glass.edge,
   },
   value: {
     color: colors.text,

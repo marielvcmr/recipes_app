@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import ProfileOption from '@/components/ProfileOption';
-import { colors } from '@/styles/global';
+import { glassSurface } from '@/styles/global';
 
 type ProfileOptionsMenuProps = {
   onSignOut: () => void;
@@ -30,9 +30,7 @@ export default function ProfileOptionsMenu({ onSignOut, onDeleteAccount }: Profi
 const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
-    backgroundColor: colors.white,
-    borderWidth: 1.2,
-    borderColor: colors.border,
+    ...glassSurface,
     borderRadius: 17,
   },
 });

@@ -8,15 +8,19 @@ import { getRecipe, listFeed } from '@/api/recipes';
 import type { Recipe, RecipeSummary } from '@/api/types';
 import AlphabetIndex from '@/components/AlphabetIndex';
 import BottomSheet from '@/components/BottomSheet';
+import GlassBackground from '@/components/GlassBackground';
 import RecipeCard from '@/components/RecipeCard';
 import RecipeView from '@/components/RecipeView';
 import ScreenHeader from '@/components/ScreenHeader';
 import SearchBar from '@/components/SearchBar';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useTabBarHeight } from '@/hooks/useTabBarHeight';
 import { colors, fonts } from '@/styles/global';
 import { initialOf } from '@/utils/alphabet';
 
 const PAGE_SIZE = 20;
+// Espacio libre al final de la lista, además del alto de la barra de pestañas
+const CONTENT_BOTTOM = 40;
 
 function errorMessage(error: unknown) {
   return error instanceof ApiError ? error.message : 'Error inesperado.';
@@ -25,6 +29,7 @@ function errorMessage(error: unknown) {
 // Explorar: recetas públicas de otros usuarios. Solo se pueden ver (no editar ni borrar)
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useTabBarHeight();
 
   // Búsqueda
   const [search, setSearch] = useState('');
@@ -144,6 +149,7 @@ export default function FeedScreen() {
 
   return (
     <View style={styles.screen}>
+      <GlassBackground />
       <FlatList
         ref={listRef}
         data={recipes}
@@ -163,11 +169,11 @@ export default function FeedScreen() {
           pendingIndex.current = null;
           if (index !== null) setTimeout(() => scrollToRecipe(index), 50);
         }}
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 27, paddingBottom: tabBarHeight + CONTENT_BOTTOM }]}
       />
 
       {recipes.length > 0 && (
-        <View style={[styles.index, { top: insets.top }]} pointerEvents="box-none">
+        <View style={[styles.index, { top: insets.top, bottom: tabBarHeight }]} pointerEvents="box-none">
           <AlphabetIndex available={letters} onSelect={jumpToLetter} />
         </View>
       )}
@@ -193,11 +199,9 @@ const styles = StyleSheet.create({
   index: {
     position: 'absolute',
     left: 2,
-    bottom: 0,
   },
   content: {
     paddingHorizontal: 22,
-    paddingBottom: 40,
   },
   headerBlock: {
     paddingBottom: 14,

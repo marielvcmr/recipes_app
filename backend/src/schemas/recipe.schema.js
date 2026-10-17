@@ -35,8 +35,8 @@ export const createRecipeSchema = z.object({
   name: z
     .string({ error: 'El nombre es obligatorio.' })
     .trim()
-    .min(2, 'El nombre debe tener entre 2 y 50 caracteres.')
-    .max(50, 'El nombre debe tener entre 2 y 50 caracteres.'),
+    .min(2, 'El nombre debe tener entre 2 y 35 caracteres.')
+    .max(35, 'El nombre debe tener entre 2 y 35 caracteres.'),
   description: z
     .string({ error: 'La descripción es obligatoria.' })
     .trim()

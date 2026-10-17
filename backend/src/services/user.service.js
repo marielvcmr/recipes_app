@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import { SALT_ROUNDS } from './auth.service.js';
 import { Recipe } from '../models/recipe.model.js';
+import { Group } from '../models/group.model.js';
+
 
 export async function updateUser(user, { password, ...changes }) 
 {
@@ -15,15 +17,19 @@ export async function updateUser(user, { password, ...changes })
 }
 
 export async function getUserCounts(user) {
-  const recipes = await Recipe.countDocuments({ owner: user._id });
-  return { recipes };
+  const [recipes, groups] = await Promise.all([
+    Recipe.countDocuments({ owner: user._id }),
+    Group.countDocuments({ owner: user._id }),
+  ]);
+  return { recipes, groups };
 }
+
 
 
 export async function deleteUser(user) {
-  /*
-    Holder to also delete this user's groups and images
-  */
+  // Holder: also delete this user's images from Cloudinary
   await Recipe.deleteMany({ owner: user._id });
+  await Group.deleteMany({ owner: user._id });
   await user.deleteOne();
 }
+

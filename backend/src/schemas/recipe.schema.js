@@ -57,6 +57,12 @@ export const createRecipeSchema = z.object({
     .array(stepSchema, { error: 'Los pasos deben ser una lista.' })
     .min(1, 'Agrega al menos 1 paso.')
     .max(30, 'Máximo 30 pasos.'),
+  groupIds: z
+    .array(objectIdField, { error: 'groupIds debe ser una lista de ids.' })
+    .max(100, 'Máximo 100 grupos.')
+    .transform(uniqueIds)
+    .optional(),
+
 });
 
 export const updateRecipeSchema = createRecipeSchema

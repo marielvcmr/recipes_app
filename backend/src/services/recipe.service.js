@@ -1,6 +1,8 @@
 import { Recipe } from '../models/recipe.model.js';
 import { AppError } from '../utils/AppError.js';
 import { normalizeName, escapeRegex } from '../utils/normalizer.js';
+import { assertOwnGroups } from './group.service.js';
+
 
 function numberSteps(steps) {
   return steps.map((step, index) => ({ position: index + 1, description: step.description }));
@@ -17,8 +19,10 @@ async function saveRecipe(recipe) {
   }
 }
 
-export async function createRecipe(ownerId, data) {
+export async function createRecipe(ownerId, { groupIds = [], ...data }) {
+  await assertOwnGroups(ownerId, groupIds);
   const recipe = new Recipe({ ...data, owner: ownerId, steps: numberSteps(data.steps) });
+  recipe.setGroups(groupIds);
   return saveRecipe(recipe);
 }
 
@@ -40,11 +44,19 @@ export async function getRecipe(userId, recipeId) {
   }).populate('owner', 'username avatarColor');
 
   if (!recipe) throw recipeNotFound();
-  return { ...recipe.toJSON(), isMine: recipe.owner._id.equals(userId) };
+    const isMine = recipe.owner._id.equals(userId);
+  const json = { ...recipe.toJSON(), isMine };
+  if (!isMine) delete json.groupIds;
+  return json;
+
 }
 
-export async function updateRecipe(ownerId, recipeId, changes) {
+export async function updateRecipe(ownerId, recipeId, { groupIds, ...changes }) {
   const recipe = await findOwnRecipe(ownerId, recipeId);
+  if (groupIds) {
+    await assertOwnGroups(ownerId, groupIds);
+    recipe.setGroups(groupIds);
+  }
   if (changes.steps) {
     changes.steps = numberSteps(changes.steps);
   }

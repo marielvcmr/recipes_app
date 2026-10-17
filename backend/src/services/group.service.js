@@ -107,3 +107,8 @@ export async function deleteGroup(ownerId, groupId) {
   );
   await group.deleteOne();
 }
+
+export async function assertOwnGroups(ownerId, groupIds) {
+  const count = await Group.countDocuments({ _id: { $in: groupIds }, owner: ownerId });
+  if (count !== groupIds.length) throw notFound();
+}

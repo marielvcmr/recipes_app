@@ -1,7 +1,7 @@
 # CookPlan — Diseño de la base de datos
 
 Base de datos **MongoDB** (Atlas), accedida con **Mongoose**. Tres colecciones: `users`, `recipes` y `groups`.
-Todas incluyen `createdAt` y `updatedAt` automáticos. Las reglas y validaciones de cada campo están en el [README del backend](../README.md).
+Todas incluyen `createdAt` y `updatedAt` automáticos.
 
 ---
 

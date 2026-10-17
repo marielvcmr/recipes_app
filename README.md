@@ -41,11 +41,9 @@ flowchart LR
 
 | Documento | Contenido |
 | --------- | --------- |
-| [`docs/requisitos.md`](docs/requisitos.md) | Requisitos funcionales de la aplicación. |
-| [`docs/frontContract.md`](docs/frontContract.md) | Contrato de la API para el frontend: conexión, formatos, objetos e imágenes. |
-| [`backend/README.md`](backend/README.md) | Stack, arquitectura, estructura, cómo ejecutar, reglas de negocio, validaciones y endpoints. |
-| [`backend/docs/DESIGN.md`](backend/docs/DESIGN.md) | Entidades, relaciones y diseño de la base de datos en MongoDB. |
-| [`frontend/README.md`](frontend/README.md) | Stack, arquitectura, estructura, pantallas y cómo ejecutar la app móvil. |
+| [`backend/README.md`](backend/README.md) | Stack, arquitectura y cómo ejecutar la API. |
+| [`backend/docs/DESIGN.md`](backend/docs/DESIGN.md) | Diseño de la base de datos en MongoDB. |
+| [`frontend/README.md`](frontend/README.md) | Stack, arquitectura y cómo ejecutar la app móvil. |
 
 ---
 

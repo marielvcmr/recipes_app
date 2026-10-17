@@ -30,6 +30,13 @@ export const colors = {
   dashed: '#cbc5b9',
   // Oscurece la pantalla detrás de una hoja inferior (BottomSheet)
   backdrop: 'rgba(24, 25, 20, 0.5)',
+  // Oscurecido suave sobre el fondo desenfocado de las hojas (BottomSheet)
+  scrim: 'rgba(24, 25, 20, 0.3)',
+  // Barrita para arrastrar las hojas: se ve sobre el fondo crema y sobre las fotos
+  handle: 'rgba(201, 196, 186, 0.95)',
+  // Índice alfabético: fondo de la barra mientras se arrastra y mini tarjetas de letras sin recetas
+  indexTrack: 'rgba(242, 238, 230, 0.92)',
+  indexCardOff: 'rgba(255, 255, 255, 0.55)',
   // Degradado oscuro sobre la foto de fondo de login y registro
   overlayTop: 'rgba(24, 25, 20, 0.5)',
   overlayBottom: 'rgba(24, 25, 20, 0.82)',

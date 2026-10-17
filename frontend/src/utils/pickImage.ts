@@ -3,8 +3,10 @@ import * as ImagePicker from 'expo-image-picker';
 
 export type ImageSourceKind = 'library' | 'camera';
 
-// Ancho máximo: el backend igual la limita a 1200 px en Cloudinary
-const MAX_WIDTH = 1200;
+// Lado más largo y calidad JPEG con que se sube. Más chica = sube más rápido: el backend la
+// reenvía a Cloudinary, y con una conexión lenta cada 100 KB se notan. 1000 px sobra para las tarjetas
+const MAX_SIZE = 1000;
+const JPEG_QUALITY = 0.6;
 
 // Abre la galería o la cámara y devuelve la foto lista para subir (o null si se canceló).
 // Siempre la convierte a JPEG y la achica: el backend solo acepta JPG/PNG/WebP de hasta 5 MB,
@@ -33,8 +35,13 @@ export async function pickRecipeImage(kind: ImageSourceKind): Promise<string | n
   const asset = result.assets[0];
 
   const context = ImageManipulator.manipulate(asset.uri);
-  if (asset.width > MAX_WIDTH) context.resize({ width: MAX_WIDTH });
+  // Se achica por el lado más largo, para que una foto vertical tampoco suba gigante
+  if (asset.width >= asset.height && asset.width > MAX_SIZE) {
+    context.resize({ width: MAX_SIZE });
+  } else if (asset.height > asset.width && asset.height > MAX_SIZE) {
+    context.resize({ height: MAX_SIZE });
+  }
   const rendered = await context.renderAsync();
-  const saved = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.7 });
+  const saved = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: JPEG_QUALITY });
   return saved.uri;
 }

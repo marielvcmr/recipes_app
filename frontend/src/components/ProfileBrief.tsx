@@ -1,23 +1,41 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, fonts } from '@/styles/global';
 
 type ProfileBriefProps = {
   recipes: number;
   groups: number;
+  // Al tocar cada número se va a su pestaña
+  onPressRecipes: () => void;
+  onPressGroups: () => void;
 };
 
-export default function ProfileBrief({ recipes, groups }: ProfileBriefProps) {
+type StatProps = {
+  value: number;
+  label: string;
+  onPress: () => void;
+  style?: StyleProp<ViewStyle>;
+};
+
+function Stat({ value, label, onPress, style }: StatProps) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${value} ${label}, ver ${label.toLowerCase()}`}
+      style={({ pressed }) => [styles.stat, style, pressed && styles.pressed]}
+    >
+      <Text style={styles.value}>{value}</Text>
+      <Text style={styles.label}>{label}</Text>
+    </Pressable>
+  );
+}
+
+export default function ProfileBrief({ recipes, groups, onPressRecipes, onPressGroups }: ProfileBriefProps) {
   return (
     <View style={styles.card}>
-      <View style={[styles.stat, styles.divider]}>
-        <Text style={styles.value}>{recipes}</Text>
-        <Text style={styles.label}>Recetas</Text>
-      </View>
-      <View style={styles.stat}>
-        <Text style={styles.value}>{groups}</Text>
-        <Text style={styles.label}>Grupos</Text>
-      </View>
+      <Stat value={recipes} label="Recetas" onPress={onPressRecipes} style={styles.divider} />
+      <Stat value={groups} label="Grupos" onPress={onPressGroups} />
     </View>
   );
 }
@@ -25,7 +43,7 @@ export default function ProfileBrief({ recipes, groups }: ProfileBriefProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    paddingVertical: 20,
+    overflow: 'hidden',
     backgroundColor: colors.white,
     borderWidth: 1.2,
     borderColor: colors.border,
@@ -34,6 +52,10 @@ const styles = StyleSheet.create({
   stat: {
     flex: 1,
     alignItems: 'center',
+    paddingVertical: 20,
+  },
+  pressed: {
+    backgroundColor: colors.segmentBg,
   },
   divider: {
     borderRightWidth: 1.2,

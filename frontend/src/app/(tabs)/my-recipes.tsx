@@ -1,5 +1,5 @@
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,29 +16,25 @@ import {
 } from '@/api/recipes';
 import type { Group, Recipe, RecipeSummary } from '@/api/types';
 import AddRecipeButton from '@/components/AddRecipeButton';
+import AlphabetIndex from '@/components/AlphabetIndex';
 import BottomSheet from '@/components/BottomSheet';
-import ProfileIcon from '@/components/ProfileIcon';
 import RecipeCard from '@/components/RecipeCard';
 import RecipeForm, { type RecipeFormValues } from '@/components/RecipeForm';
 import RecipeView from '@/components/RecipeView';
-import ScreenTitle from '@/components/ScreenTitle';
+import ScreenHeader from '@/components/ScreenHeader';
 import SearchBar from '@/components/SearchBar';
 import SegmentedRecipeTab, { type VisibilityFilter } from '@/components/SegmentedRecipeTab';
-import { useAuth } from '@/context/AuthContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { colors, fonts } from '@/styles/global';
+import { initialOf } from '@/utils/alphabet';
 import { toFormErrors, type FormErrors } from '@/utils/errors';
 
 const PAGE_SIZE = 20;
 
-// Letra de la sección: sin tildes ("Ángel" → "A", "Ñoquis" → "N"), como ordena el backend
-function initialOf(name: string) {
-  const letter = name.trim().charAt(0).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
-  return /[A-Z]/.test(letter) ? letter : '#';
-}
+type Section = { title: string; data: RecipeSummary[] };
 
-// El backend ya devuelve A–Z: basta con ir juntando las recetas seguidas que empiezan igual
 function groupByInitial(recipes: RecipeSummary[]) {
-  const sections: { title: string; data: RecipeSummary[] }[] = [];
+  const sections: Section[] = [];
   for (const recipe of recipes) {
     const title = initialOf(recipe.name);
     const last = sections[sections.length - 1];
@@ -56,12 +52,11 @@ function errorMessage(error: unknown) {
 type Sheet = { mode: 'closed' } | { mode: 'view'; id: string } | { mode: 'form'; recipe?: Recipe };
 
 export default function MyRecipesScreen() {
-  const { user } = useAuth();
   const insets = useSafeAreaInsets();
 
   // Búsqueda y filtro
   const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
+  const query = useDebouncedValue(search);
   const [visibility, setVisibility] = useState<VisibilityFilter>(undefined);
 
   // Lista paginada
@@ -83,12 +78,6 @@ export default function MyRecipesScreen() {
   const [formKey, setFormKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>();
-
-  // Espera 300 ms después de la última tecla antes de buscar
-  useEffect(() => {
-    const timer = setTimeout(() => setQuery(search.trim()), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   const loadPage = useCallback(
     async (pageToLoad: number) => {
@@ -127,6 +116,23 @@ export default function MyRecipesScreen() {
   };
 
   const sections = useMemo(() => groupByInitial(recipes), [recipes]);
+  const letters = useMemo(() => sections.map((section) => section.title), [sections]);
+
+  // --- Índice alfabético: salta a la sección de la letra elegida ---
+  const listRef = useRef<SectionList<RecipeSummary, Section>>(null);
+  // Si la sección todavía no se dibujó, se reintenta una vez tras acercarse (ver onScrollToIndexFailed)
+  const pendingSection = useRef<number | null>(null);
+
+  const scrollToSection = (sectionIndex: number) => {
+    listRef.current?.scrollToLocation({ sectionIndex, itemIndex: 0, animated: false });
+  };
+
+  const jumpToLetter = (letter: string) => {
+    const sectionIndex = sections.findIndex((section) => section.title === letter);
+    if (sectionIndex === -1) return;
+    pendingSection.current = sectionIndex;
+    scrollToSection(sectionIndex);
+  };
 
   // --- Hoja: ver receta ---
   const openRecipe = async (id: string) => {
@@ -212,14 +218,7 @@ export default function MyRecipesScreen() {
 
   const header = (
     <View style={styles.headerBlock}>
-      <View style={styles.header}>
-        <ScreenTitle lead="Mis" accent="recetas" />
-        {user && (
-          <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel="Abrir perfil">
-            <ProfileIcon name={user.username} color={user.avatarColor} size={42} />
-          </Pressable>
-        )}
-      </View>
+      <ScreenHeader lead="Mis" accent="recetas" />
 
       <View style={styles.search}>
         <SearchBar value={search} onChangeText={setSearch} />
@@ -256,6 +255,7 @@ export default function MyRecipesScreen() {
   return (
     <View style={styles.screen}>
       <SectionList
+        ref={listRef}
         sections={sections}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <RecipeCard recipe={item} onPress={() => openRecipe(item.id)} />}
@@ -271,9 +271,22 @@ export default function MyRecipesScreen() {
         onEndReached={loadMore}
         onEndReachedThreshold={0.4}
         stickySectionHeadersEnabled={false}
+        // Las tarjetas no tienen alto fijo: si la sección está lejos, primero se acerca con el alto promedio
+        onScrollToIndexFailed={(info) => {
+          listRef.current?.getScrollResponder()?.scrollTo({ y: info.averageItemLength * info.index, animated: false });
+          const sectionIndex = pendingSection.current;
+          pendingSection.current = null;
+          if (sectionIndex !== null) setTimeout(() => scrollToSection(sectionIndex), 50);
+        }}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[styles.content, { paddingTop: insets.top + 27 }]}
       />
+
+      {sections.length > 0 && (
+        <View style={[styles.index, { top: insets.top }]} pointerEvents="box-none">
+          <AlphabetIndex available={letters} onSelect={jumpToLetter} />
+        </View>
+      )}
 
       <AddRecipeButton onPress={() => openForm()} />
 
@@ -310,6 +323,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
+  // A la izquierda, dentro del margen de 22 que dejan las tarjetas
+  index: {
+    position: 'absolute',
+    left: 2,
+    bottom: 0,
+  },
   content: {
     paddingHorizontal: 22,
     // Espacio para que el botón + no tape la última receta
@@ -317,11 +336,6 @@ const styles = StyleSheet.create({
   },
   headerBlock: {
     paddingBottom: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
   },
   search: {
     paddingTop: 24,

@@ -6,6 +6,7 @@ import { listMyRecipes } from '@/api/recipes';
 import type { RecipeSummary } from '@/api/types';
 import SearchBar from '@/components/SearchBar';
 import SelectableRecipeRow from '@/components/SelectableRecipeRow';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { colors, fonts } from '@/styles/global';
 
 type RecipePickerProps = {
@@ -19,14 +20,9 @@ const LIMIT = 50;
 // Buscador + lista con casillas de mis recetas. La selección se mantiene aunque cambie la búsqueda
 export default function RecipePicker({ selected, onChange }: RecipePickerProps) {
   const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
+  const query = useDebouncedValue(search);
   // Resultado de la última búsqueda que respondió; mientras no sea la de query, se está cargando
   const [result, setResult] = useState<{ query: string; recipes: RecipeSummary[]; error?: string }>();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setQuery(search.trim()), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   useEffect(() => {
     let current = true;

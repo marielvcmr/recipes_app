@@ -21,8 +21,9 @@ const API_URL = resolveApiUrl();
 
 // Si el servidor no responde en este tiempo, se corta la petición
 const TIMEOUT_MS = 10_000;
-// Subir una foto tarda más: el backend además la reenvía a Cloudinary
-const UPLOAD_TIMEOUT_MS = 30_000;
+// Subir una foto tarda más: el backend además la reenvía a Cloudinary, y con una conexión
+// de subida lenta eso solo puede pasar de 30 s (la foto llegaba, pero la app ya había cortado)
+const UPLOAD_TIMEOUT_MS = 90_000;
 
 // Error con el mismo formato que devuelve el backend: { error: { code, message, details } }
 export class ApiError extends Error {
@@ -82,8 +83,10 @@ async function request<T>(path: string, { method = 'GET', body }: RequestOptions
       body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: controller.signal,
     });
-  } catch {
-    // No hubo respuesta: IP o puerto equivocados, backend apagado, otra red WiFi o firewall
+  } catch (error) {
+    // No hubo respuesta: IP o puerto equivocados, backend apagado, otra red WiFi o firewall.
+    // En desarrollo se imprime el error real: fetch también falla así si el body no se puede enviar
+    if (__DEV__) console.warn(`${method} ${path} falló antes de llegar al servidor:`, error);
     throw new ApiError(0, 'NETWORK_ERROR', 'No se pudo conectar con el servidor.');
   } finally {
     clearTimeout(timeout);

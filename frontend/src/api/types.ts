@@ -69,7 +69,8 @@ export type Step = {
   description: string;
 };
 
-// Receta como viene en los listados (GET /recipes/mine, GET /recipes): sin ingredientes ni pasos
+// Receta como viene en los listados (GET /recipes/mine, GET /recipes): sin ingredientes ni pasos,
+// pero con cuántos ingredientes tiene
 export type RecipeSummary = {
   id: string;
   owner: RecipeOwner;
@@ -79,12 +80,13 @@ export type RecipeSummary = {
   difficulty: string;
   isPublic: boolean;
   imageUrl: string | null;
+  ingredientCount: number;
   createdAt: string;
   updatedAt: string;
 };
 
 // Receta completa (GET /recipes/:id). groupIds solo viene si la receta es mía
-export type Recipe = RecipeSummary & {
+export type Recipe = Omit<RecipeSummary, 'ingredientCount'> & {
   ingredients: Ingredient[];
   steps: Step[];
   groupIds?: string[];

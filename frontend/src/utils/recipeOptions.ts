@@ -15,11 +15,23 @@ export const DIFFICULTIES = [
 ] as const satisfies readonly Option[];
 
 export const UNITS = [
-  { value: 'unidades', label: 'Unidad' },
-  { value: 'g', label: 'g' },
-  { value: 'ml', label: 'ml' },
+  { value: 'g', label: 'Gramos (g)' },
+  { value: 'kg', label: 'Kilogramos (kg)' },
+  { value: 'ml', label: 'Mililitros (ml)' },
+  { value: 'l', label: 'Litros (l)' },
+  { value: 'lb', label: 'Libras (lb)' },
+  { value: 'oz', label: 'Onzas (oz)' },
+  { value: 'fl. oz.', label: 'Onzas líquidas (fl. oz.)' },
   { value: 'tazas', label: 'Tazas' },
   { value: 'cucharadas', label: 'Cucharadas' },
+  { value: 'cucharaditas', label: 'Cucharaditas' },
+  { value: 'unidades', label: 'Unidades / Piezas' },
+  { value: 'dientes', label: 'Dientes' },
+  { value: 'hojas', label: 'Hojas' },
+  { value: 'pizcas', label: 'Pizcas' },
+  { value: 'puñados', label: 'Puñados' },
+  { value: 'chorritos', label: 'Chorritos' },
+  { value: 'paquetes', label: 'Sobres / Paquetes' },
 ] as const satisfies readonly Option[];
 
 // En el backend la visibilidad es el booleano isPublic

@@ -116,6 +116,7 @@ backend/
 **Vistas**
 - **Mis recetas**: todas las recetas del usuario, públicas y privadas, con filtro Todas / Públicas / Privadas.
 - **Explorar**: recetas públicas de todos los usuarios, con su autor.
+- En los listados (Mis recetas y Explorar) cada receta trae `ingredientCount` en vez de la lista de ingredientes y pasos.
 
 ---
 
@@ -144,9 +145,9 @@ Ningún campo obligatorio puede quedar vacío (se aplica `trim`). Cada campo tie
 | `ingredients`            | Sí          | 1–30 elementos. |
 | `ingredients[].name`     | Sí          | 2–20 caracteres. |
 | `ingredients[].quantity` | Sí          | Número > 0 y ≤ 9999. |
-| `ingredients[].unit`     | Sí          | `unidades` \| `g` \| `ml` \| `tazas` \| `cucharadas` |
+| `ingredients[].unit`     | Sí          | `g` \| `kg` \| `ml` \| `l` \| `lb` \| `oz` \| `fl. oz.` \| `tazas` \| `cucharadas` \| `cucharaditas` \| `unidades` \| `dientes` \| `hojas` \| `pizcas` \| `puñados` \| `chorritos` \| `paquetes` |
 | `steps`                  | Sí          | 1–30 elementos, en orden. |
-| `steps[].description`    | Sí          | 3–150 caracteres. |
+| `steps[].description`    | Sí          | 3–300 caracteres. |
 | `groupIds`               | No          | Ids de grupos propios. |
 
 ### Imagen de receta

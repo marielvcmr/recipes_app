@@ -5,6 +5,7 @@ import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-nativ
 import type { RecipeInput } from '@/api/recipes';
 import type { Group, Recipe } from '@/api/types';
 import Button from '@/components/Button';
+import FormErrorSummary from '@/components/FormErrorSummary';
 import RecipeImage from '@/components/RecipeImage';
 import Select from '@/components/Select';
 import TextField from '@/components/TextField';
@@ -40,7 +41,7 @@ type RecipeFormProps = {
 };
 
 const DESCRIPTION_MAX = 200;
-const STEP_MAX = 150;
+const STEP_MAX = 300;
 
 // Cada fila necesita una key estable para que React no mezcle los inputs al borrar una del medio
 let lastKey = 0;
@@ -73,6 +74,32 @@ function AddRowButton({ title, onPress }: { title: string; onPress: () => void }
       <Text style={styles.addRowText}>{title}</Text>
     </Pressable>
   );
+}
+
+// Nombre de cada campo del backend como se ve en el formulario
+function fieldLabel(field: string) {
+  const [name, index] = field.split('.');
+  const row = index !== undefined ? Number(index) + 1 : undefined;
+  switch (name) {
+    case 'name':
+      return 'Título';
+    case 'description':
+      return 'Descripción';
+    case 'timeMinutes':
+      return 'Tiempo';
+    case 'difficulty':
+      return 'Dificultad';
+    case 'isPublic':
+      return 'Visibilidad';
+    case 'ingredients':
+      return row ? `Ingrediente ${row}` : 'Ingredientes';
+    case 'steps':
+      return row ? `Paso ${row}` : 'Pasos';
+    case 'groupIds':
+      return 'Grupos';
+    default:
+      return field;
+  }
 }
 
 export default function RecipeForm({ recipe, groups, onSubmit, onClose, loading = false, errors }: RecipeFormProps) {
@@ -423,7 +450,7 @@ export default function RecipeForm({ recipe, groups, onSubmit, onClose, loading 
         )}
       </View>
 
-      {errors?.message && <Text style={styles.error}>{errors.message}</Text>}
+      <FormErrorSummary errors={errors} labelFor={fieldLabel} />
 
       <Button title={editing ? 'Guardar cambios' : 'Crear receta'} onPress={handleSubmit} loading={loading} />
     </View>
@@ -509,13 +536,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
   },
-  error: {
-    color: colors.error,
-    fontFamily: fonts.bold,
-    fontSize: 14,
-    lineHeight: 21,
-    textAlign: 'center',
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -591,13 +611,13 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   nameColumn: {
-    flex: 1.25,
+    flex: 1,
   },
   quantityColumn: {
-    flex: 0.7,
+    flex: 0.6,
   },
   unitColumn: {
-    flex: 1,
+    flex: 1.35,
   },
   ingredientRow: {
     flexDirection: 'row',

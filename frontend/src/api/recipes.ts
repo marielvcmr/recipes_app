@@ -1,3 +1,5 @@
+import { File } from 'expo-file-system';
+
 import { apiFetch, apiFetchPage } from '@/api/client';
 import type { Recipe, RecipeSummary } from '@/api/types';
 import type { Difficulty, Unit } from '@/utils/recipeOptions';
@@ -29,6 +31,19 @@ export function listMyRecipes({ q, visibility, page = 1, limit = 20 }: ListMineO
   return apiFetchPage<RecipeSummary>(`/recipes/mine?${params}`);
 }
 
+type ListFeedOptions = {
+  q?: string;
+  page?: number;
+  limit?: number;
+};
+
+// GET /recipes?excludeMine=true: Explorar, recetas públicas de otros usuarios, A–Z, paginadas
+export function listFeed({ q, page = 1, limit = 20 }: ListFeedOptions = {}) {
+  const params = new URLSearchParams({ excludeMine: 'true', page: String(page), limit: String(limit) });
+  if (q) params.set('q', q);
+  return apiFetchPage<RecipeSummary>(`/recipes?${params}`);
+}
+
 // GET /recipes/:id: receta propia o pública, con ingredientes, pasos e isMine
 export async function getRecipe(id: string) {
   return (await apiFetch<{ recipe: Recipe }>(`/recipes/${id}`)).recipe;
@@ -52,8 +67,9 @@ export function deleteRecipe(id: string) {
 // PUT /recipes/:id/image: sube o reemplaza la foto. Va como multipart en el campo "image"
 export async function uploadRecipeImage(id: string, uri: string) {
   const form = new FormData();
-  // En React Native un archivo se manda como { uri, name, type }; TypeScript espera un Blob
-  form.append('image', { uri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
+  // Expo reemplaza fetch por expo/fetch, que no acepta el { uri, name, type } de React Native:
+  // el archivo tiene que ir como File de expo-file-system (pickRecipeImage ya lo guarda como .jpg)
+  form.append('image', new File(uri));
   return (await apiFetch<{ recipe: Recipe }>(`/recipes/${id}/image`, { method: 'PUT', body: form })).recipe;
 }
 

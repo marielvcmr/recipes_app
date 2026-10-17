@@ -78,14 +78,19 @@ async function findPage(filter, { q, page, limit }) {
     filter.nameNormalized = { $regex: escapeRegex(normalizeName(q)) };
   }
 
+  // Los ingredientes se cargan solo para contarlos: en los listados va ingredientCount, no la lista
   const query = Recipe.find(filter)
-    .select('-ingredients -steps -groups')
+    .select('-steps -groups')
     .populate('owner', 'username avatarColor')
     .sort({ nameNormalized: 1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
-  const [recipes, total] = await Promise.all([query, Recipe.countDocuments(filter)]);
+  const [docs, total] = await Promise.all([query, Recipe.countDocuments(filter)]);
+  const recipes = docs.map((doc) => {
+    const { ingredients, ...recipe } = doc.toJSON();
+    return { ...recipe, ingredientCount: ingredients.length };
+  });
   return { recipes, meta: { page, limit, total } };
 }
 

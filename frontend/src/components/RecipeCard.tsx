@@ -10,32 +10,47 @@ import { difficultyLabel } from '@/utils/recipeOptions';
 type RecipeCardProps = {
   recipe: RecipeSummary;
   onPress: () => void;
+  // mine (Mis recetas): autor sobre la foto y si es pública o privada.
+  // explore (Explorar): "Por autor" bajo el título y cuántos ingredientes tiene
+  variant?: 'mine' | 'explore';
 };
 
-export default function RecipeCard({ recipe, onPress }: RecipeCardProps) {
+export default function RecipeCard({ recipe, onPress, variant = 'mine' }: RecipeCardProps) {
+  const explore = variant === 'explore';
+
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Ver receta ${recipe.name}`}
+      accessibilityLabel={explore ? `Ver receta ${recipe.name}, por ${recipe.owner.username}` : `Ver receta ${recipe.name}`}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.imageBox}>
-        <RecipeImage uri={recipe.imageUrl} iconSize={30} />
+        {/* Posición absoluta: la foto se adapta al alto que le dé el texto y nunca estira la tarjeta */}
+        <View style={StyleSheet.absoluteFill}>
+          <RecipeImage uri={recipe.imageUrl} iconSize={30} />
+        </View>
 
         {/* Autor de la receta, sobre la foto */}
-        <View style={styles.author}>
-          <ProfileIcon name={recipe.owner.username} color={recipe.owner.avatarColor} size={16} />
-          <Text style={styles.authorName} numberOfLines={1}>
-            {recipe.owner.username}
-          </Text>
-        </View>
+        {!explore && (
+          <View style={styles.author}>
+            <ProfileIcon name={recipe.owner.username} color={recipe.owner.avatarColor} size={16} />
+            <Text style={styles.authorName} numberOfLines={1}>
+              {recipe.owner.username}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={styles.title} numberOfLines={explore ? 2 : 1}>
           {recipe.name}
         </Text>
+        {explore && (
+          <Text style={styles.byline} numberOfLines={1}>
+            Por {recipe.owner.username}
+          </Text>
+        )}
         <Text style={styles.description} numberOfLines={2}>
           {recipe.description}
         </Text>
@@ -46,9 +61,13 @@ export default function RecipeCard({ recipe, onPress }: RecipeCardProps) {
           <Text style={styles.dot}>•</Text>
           <Text style={styles.metaText}>{difficultyLabel(recipe.difficulty)}</Text>
           <Text style={styles.dot}>•</Text>
-          <Text style={[styles.visibility, { color: recipe.isPublic ? colors.primary : colors.avatar }]}>
-            {recipe.isPublic ? 'Pública' : 'Privada'}
-          </Text>
+          {explore ? (
+            <Text style={styles.metaText}>{recipe.ingredientCount} ing.</Text>
+          ) : (
+            <Text style={[styles.visibility, { color: recipe.isPublic ? colors.primary : colors.avatar }]}>
+              {recipe.isPublic ? 'Pública' : 'Privada'}
+            </Text>
+          )}
         </View>
       </View>
     </Pressable>
@@ -104,6 +123,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.heading,
     fontSize: 18,
     lineHeight: 21.6,
+  },
+  byline: {
+    marginTop: 3,
+    color: colors.primary,
+    fontFamily: fonts.bold,
+    fontSize: 12,
+    lineHeight: 18,
   },
   description: {
     marginTop: 6,

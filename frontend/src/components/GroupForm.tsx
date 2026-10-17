@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import type { GroupDetail } from '@/api/types';
 import Button from '@/components/Button';
+import FormErrorSummary from '@/components/FormErrorSummary';
 import IconButton from '@/components/IconButton';
 import RecipePicker from '@/components/RecipePicker';
 import TextField from '@/components/TextField';
@@ -27,13 +28,31 @@ type GroupFormProps = {
 const NAME_MIN = 2;
 const NAME_MAX = 20;
 
+// Nombre de cada campo del backend como se ve en el formulario
+function fieldLabel(field: string) {
+  if (field === 'name') return 'Nombre';
+  if (field.startsWith('recipeIds')) return 'Recetas';
+  return field;
+}
+
 export default function GroupForm({ group, onSubmit, onClose, loading = false, errors }: GroupFormProps) {
   const editing = !!group;
   const [name, setName] = useState(group?.name ?? '');
   const [recipeIds, setRecipeIds] = useState<string[]>(() => group?.recipes.map((recipe) => recipe.id) ?? []);
-  const fields = errors?.fields ?? {};
+  // Error que se detecta aquí mismo (nombre muy corto), antes de llamar al backend
+  const [localErrors, setLocalErrors] = useState<FormErrors>();
+  const shown = localErrors ?? errors;
+  const fields = shown?.fields ?? {};
 
-  const validName = name.trim().length >= NAME_MIN;
+  const handleSubmit = () => {
+    const trimmed = name.trim();
+    if (trimmed.length < NAME_MIN) {
+      setLocalErrors({ fields: { name: `El nombre del grupo debe tener entre ${NAME_MIN} y ${NAME_MAX} caracteres.` } });
+      return;
+    }
+    setLocalErrors(undefined);
+    onSubmit({ name: trimmed, recipeIds });
+  };
 
   return (
     <View style={styles.form}>
@@ -55,7 +74,10 @@ export default function GroupForm({ group, onSubmit, onClose, loading = false, e
         labelStyle={styles.label}
         placeholder="Ej. Domingos en familia"
         value={name}
-        onChangeText={setName}
+        onChangeText={(text) => {
+          setName(text);
+          setLocalErrors(undefined);
+        }}
         maxLength={NAME_MAX}
         error={fields.name}
       />
@@ -68,14 +90,9 @@ export default function GroupForm({ group, onSubmit, onClose, loading = false, e
         {fields.recipeIds && <Text style={styles.error}>{fields.recipeIds}</Text>}
       </View>
 
-      {errors?.message && <Text style={styles.error}>{errors.message}</Text>}
+      <FormErrorSummary errors={shown} labelFor={fieldLabel} />
 
-      <Button
-        title={editing ? 'Guardar cambios' : 'Crear grupo'}
-        onPress={() => onSubmit({ name: name.trim(), recipeIds })}
-        loading={loading}
-        disabled={!validName}
-      />
+      <Button title={editing ? 'Guardar cambios' : 'Crear grupo'} onPress={handleSubmit} loading={loading} />
     </View>
   );
 }

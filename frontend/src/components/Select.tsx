@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, fonts } from '@/styles/global';
 import type { Option } from '@/utils/recipeOptions';
@@ -41,9 +41,10 @@ export default function Select<T extends string>({
         accessibilityState={{ expanded: open }}
         style={[styles.box, compact && styles.boxCompact, error && styles.boxError]}
       >
+        {/* En la versión chica (columna angosta) el texto pasa a otra línea en vez de cortarse con "…" */}
         <Text
           style={[styles.value, compact && styles.valueCompact, !selected && styles.placeholder]}
-          numberOfLines={1}
+          numberOfLines={compact ? undefined : 1}
         >
           {selected?.label ?? placeholder}
         </Text>
@@ -51,7 +52,8 @@ export default function Select<T extends string>({
       </Pressable>
 
       {open && (
-        <View style={styles.list}>
+        // Con muchas opciones (ej. unidades) la lista tiene un alto máximo y se desplaza por dentro
+        <ScrollView style={styles.list} nestedScrollEnabled keyboardShouldPersistTaps="handled">
           {options.map((option) => {
             const active = option.value === value;
             return (
@@ -65,16 +67,13 @@ export default function Select<T extends string>({
                 accessibilityState={{ selected: active }}
                 style={({ pressed }) => [styles.option, compact && styles.optionCompact, pressed && styles.optionPressed]}
               >
-                <Text
-                  style={[styles.optionText, compact && styles.valueCompact, active && styles.optionActive]}
-                  numberOfLines={1}
-                >
+                <Text style={[styles.optionText, compact && styles.valueCompact, active && styles.optionActive]}>
                   {option.label}
                 </Text>
               </Pressable>
             );
           })}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -95,6 +94,7 @@ const styles = StyleSheet.create({
   },
   boxCompact: {
     minHeight: 44,
+    paddingVertical: 6,
     paddingLeft: 12,
     paddingRight: 8,
   },
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     height: 6,
   },
   list: {
+    maxHeight: 264,
     marginTop: 4,
     overflow: 'hidden',
     backgroundColor: colors.white,

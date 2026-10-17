@@ -1,5 +1,5 @@
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,6 +22,7 @@ import GroupView from '@/components/GroupView';
 import RecipeView from '@/components/RecipeView';
 import ScreenTitle from '@/components/ScreenTitle';
 import SearchBar from '@/components/SearchBar';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { colors, fonts } from '@/styles/global';
 import { toFormErrors, type FormErrors } from '@/utils/errors';
 
@@ -44,7 +45,7 @@ export default function GroupsScreen() {
 
   // Búsqueda
   const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
+  const query = useDebouncedValue(search);
 
   // Lista paginada
   const [groups, setGroups] = useState<Group[]>([]);
@@ -66,12 +67,6 @@ export default function GroupsScreen() {
   const [formKey, setFormKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>();
-
-  // Espera 300 ms después de la última tecla antes de buscar
-  useEffect(() => {
-    const timer = setTimeout(() => setQuery(search.trim()), 300);
-    return () => clearTimeout(timer);
-  }, [search]);
 
   const loadPage = useCallback(
     async (pageToLoad: number) => {

@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -116,7 +116,12 @@ export default function ProfileScreen() {
         </Pressable>
       </View>
 
-      <ProfileBrief recipes={counts.recipes} groups={counts.groups} />
+      <ProfileBrief
+        recipes={counts.recipes}
+        groups={counts.groups}
+        onPressRecipes={() => router.navigate('/my-recipes')}
+        onPressGroups={() => router.navigate('/groups')}
+      />
 
       <View style={styles.menu}>
         <ProfileOptionsMenu onSignOut={signOut} onDeleteAccount={handleDeleteAccount} />

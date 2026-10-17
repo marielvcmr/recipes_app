@@ -4,9 +4,6 @@ import userRoutes from './user.routes.js';
 import recipeRoutes from './recipe.routes.js';
 import groupRoutes from './group.routes.js';
 
-
-
-
 const router = Router();
 
 router.get('/health', (req, res) => {
@@ -16,7 +13,7 @@ router.get('/health', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/recipes', recipeRoutes);
-
+router.use('/groups', groupRoutes);
 
 
 export default router;

@@ -59,6 +59,35 @@ Para generar el APK (backend desplegado, URL en EAS, comando de build): [`docs/b
 
 ---
 
+## Arquitectura
+
+```mermaid
+flowchart LR
+    U(["Usuario"]) --> P["Pantallas<br/>app"] --> CMP["Components"]
+    P --> CTX["Context<br/>sesión"] --> ST["Storage<br/>token"]
+    P --> API["api"] --> CL["client.ts"] -- "HTTP + JWT" --> BE[("API REST")]
+    CL -. lee el token .-> ST
+    CL -. error .-> ERR["utils/errors"]
+    ERR --> MSG(["Mensaje en pantalla"])
+```
+
+Las pantallas nunca llaman al backend directamente: piden los datos a `api`, y `client.ts` es el único que hace `fetch`, añade el token y convierte los errores del backend en mensajes para el usuario.
+
+| Capa         | Responsabilidad                                                                  |
+| ------------ | -------------------------------------------------------------------------------- |
+| `app`        | Pantallas y navegación (Expo Router). Cada archivo es una ruta.                  |
+| `components` | Piezas de UI reutilizables. Reciben todo por props; no llaman a la API.          |
+| `api`        | Un archivo por recurso del backend. `client.ts` pone la URL base y el token.     |
+| `context`    | Estado global de la sesión: usuario, token, login y logout.                      |
+| `storage`    | Guarda el token en el teléfono para mantener la sesión abierta.                  |
+| `styles`     | Colores, tipografía y estilos compartidos, según el diseño en Figma.             |
+| `types`      | Tipos de TypeScript que reflejan las respuestas de la API.                       |
+| `utils`      | Funciones de apoyo: mensajes de error y validaciones iguales a las del backend. |
+
+El contrato de la API que consume la app está en [`docs/frontContract.md`](../docs/frontContract.md).
+
+---
+
 ## Estructura de carpetas
 
 ```

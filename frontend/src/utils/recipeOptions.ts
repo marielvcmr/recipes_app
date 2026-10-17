@@ -35,3 +35,8 @@ export type Visibility = (typeof VISIBILITIES)[number]['value'];
 export function difficultyLabel(value: string) {
   return DIFFICULTIES.find((option) => option.value === value)?.label ?? value;
 }
+
+// "25 min · Fácil": línea corta de info en las filas de recetas
+export function timeAndDifficulty(recipe: { timeMinutes: number; difficulty: string }) {
+  return `${recipe.timeMinutes} min · ${difficultyLabel(recipe.difficulty)}`;
+}

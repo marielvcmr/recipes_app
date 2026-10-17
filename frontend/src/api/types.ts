@@ -39,11 +39,14 @@ export type User = {
   updatedAt: string;
 };
 
-// Grupo del usuario tal como lo devuelve GET /groups
+// Grupo del usuario tal como lo devuelve GET /groups.
+// coverUrls: fotos de las 2 primeras recetas A–Z con foto (portada de la tarjeta); coverUrl es la primera
 export type Group = {
   id: string;
   name: string;
   recipeCount: number;
+  coverUrl: string | null;
+  coverUrls: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -86,4 +89,20 @@ export type Recipe = RecipeSummary & {
   steps: Step[];
   groupIds?: string[];
   isMine: boolean;
+};
+
+// Receta dentro del detalle de un grupo (GET /groups/:id): sin autor poblado, ingredientes ni pasos
+export type GroupRecipe = {
+  id: string;
+  name: string;
+  description: string;
+  timeMinutes: number;
+  difficulty: string;
+  isPublic: boolean;
+  imageUrl: string | null;
+};
+
+// Detalle de un grupo: sus recetas activas, A–Z
+export type GroupDetail = Group & {
+  recipes: GroupRecipe[];
 };

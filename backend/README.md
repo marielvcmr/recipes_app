@@ -111,6 +111,7 @@ backend/
 - Quitar una receta de un grupo es un **borrado lógico**: la asociación no se elimina, se marca como inactiva (`isActive: false`) y la receta deja de aparecer en ese grupo. La receta sigue existiendo.
 - Si la receta se vuelve a añadir al mismo grupo, la asociación se reactiva (`isActive: true`).
 - Borrar un grupo borra también las recetas que están activas en él, aunque estén en otros grupos. Las que habían sido quitadas del grupo no se borran. El front debe advertirlo usando `recipeCount`.
+- Las respuestas de grupos incluyen la portada: `coverUrls` son las fotos de las 2 primeras recetas A–Z del grupo que tienen foto (puede venir vacío) y `coverUrl` es la primera de ellas o `null`.
 
 **Vistas**
 - **Mis recetas**: todas las recetas del usuario, públicas y privadas, con filtro Todas / Públicas / Privadas.
@@ -205,7 +206,7 @@ Base URL: `/api/v1`
 
 | Método | Ruta                            | Descripción |
 | ------ | ------------------------------- | ----------- |
-| GET    | `/groups`                       | Mis grupos (con `recipeCount`) |
+| GET    | `/groups`                       | Mis grupos (con `recipeCount`, `coverUrl` y `coverUrls`) |
 | GET    | `/groups/:id`                   | Detalle del grupo y sus recetas |
 | POST   | `/groups`                       | Crear grupo |
 | PATCH  | `/groups/:id`                   | Renombrar grupo |

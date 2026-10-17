@@ -21,6 +21,7 @@ import ProfileIcon from '@/components/ProfileIcon';
 import RecipeCard from '@/components/RecipeCard';
 import RecipeForm, { type RecipeFormValues } from '@/components/RecipeForm';
 import RecipeView from '@/components/RecipeView';
+import ScreenTitle from '@/components/ScreenTitle';
 import SearchBar from '@/components/SearchBar';
 import SegmentedRecipeTab, { type VisibilityFilter } from '@/components/SegmentedRecipeTab';
 import { useAuth } from '@/context/AuthContext';
@@ -145,7 +146,7 @@ export default function MyRecipesScreen() {
     setFormKey((key) => key + 1);
     setSheet({ mode: 'form', recipe });
     // Mis grupos, para el dropdown "Grupos" del formulario (el backend permite hasta 50 por página)
-    listGroups(1, 50)
+    listGroups({ limit: 50 })
       .then((result) => setGroups(result.data))
       .catch(() => setGroups([]));
   };
@@ -212,9 +213,7 @@ export default function MyRecipesScreen() {
   const header = (
     <View style={styles.headerBlock}>
       <View style={styles.header}>
-        <Text style={styles.title}>
-          Mis <Text style={styles.titleAccent}>recetas</Text>
-        </Text>
+        <ScreenTitle lead="Mis" accent="recetas" />
         {user && (
           <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel="Abrir perfil">
             <ProfileIcon name={user.username} color={user.avatarColor} size={42} />
@@ -323,17 +322,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-  },
-  title: {
-    color: colors.text,
-    fontFamily: fonts.heading,
-    fontSize: 34,
-    lineHeight: 36.72,
-    letterSpacing: -0.68,
-  },
-  titleAccent: {
-    color: colors.primary,
-    fontFamily: fonts.headingItalic,
   },
   search: {
     paddingTop: 24,

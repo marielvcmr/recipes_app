@@ -13,9 +13,10 @@ type RecipeViewProps = {
   loading?: boolean;
   error?: string;
   onClose: () => void;
-  // Editar y Eliminar solo se muestran si la receta es mía (recipe.isMine)
-  onEdit: () => void;
-  onDelete: () => void;
+  // Editar y Eliminar solo se muestran si la receta es mía (recipe.isMine) y se pasan ambos
+  // (desde el detalle de un grupo se abre en solo lectura)
+  onEdit?: () => void;
+  onDelete?: () => void;
   deleting?: boolean;
 };
 
@@ -106,7 +107,7 @@ export default function RecipeView({
           ))}
         </View>
 
-        {recipe.isMine && (
+        {recipe.isMine && onEdit && onDelete && (
           <View style={styles.actions}>
             <Pressable
               onPress={onEdit}

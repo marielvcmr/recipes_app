@@ -10,7 +10,7 @@
 ## 2. Recetas (CRUD)
 
 - **RF-05** El usuario puede crear múltiples recetas, cada una con nombre, descripción, tiempo de preparación (minutos), dificultad (Fácil, Media, Difícil), ingredientes y pasos.
-- **RF-06** Cada ingrediente tiene nombre, cantidad y unidad (unidades, g, ml, tazas, cucharadas).
+- **RF-06** Cada ingrediente tiene nombre, cantidad y unidad (Gramos (g), Kilogramos (kg), Mililitros (ml), Litros (l), Libras (lb), Onzas (oz), Onzas líquidas (fl. oz.), Tazas, Cucharadas, Cucharaditas, Unidades / Piezas, Dientes, Hojas, Pizcas, Puñados, Chorritos, Sobres / Paquetes).
 - **RF-07** Cada paso tiene una posición y una descripción.
 - **RF-08** El usuario puede ver, editar y borrar sus recetas.
 - **RF-09** Las recetas se presentan ordenadas alfabéticamente.

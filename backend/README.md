@@ -168,11 +168,13 @@ Cada petición pasa por las mismas capas en orden. Si algo falla en cualquier pu
 - Quitar una receta de un grupo es un **borrado lógico**: la asociación no se elimina, se marca como inactiva (`isActive: false`) y la receta deja de aparecer en ese grupo. La receta sigue existiendo.
 - Si la receta se vuelve a añadir al mismo grupo, la asociación se reactiva (`isActive: true`).
 - Borrar un grupo borra también las recetas que están activas en él, aunque estén en otros grupos. Las que habían sido quitadas del grupo no se borran. El front debe advertirlo usando `recipeCount`.
+- Las respuestas de grupos incluyen la portada: `coverUrls` son las fotos de las 2 primeras recetas A–Z del grupo que tienen foto (puede venir vacío) y `coverUrl` es la primera de ellas o `null`.
 - Cada grupo incluye `coverUrl`: la foto de su primera receta activa (orden alfabético) que tenga imagen, o `null` si ninguna tiene. Se calcula en cada petición, así que siempre está actualizada.
 
 **Vistas**
 - **Mis recetas**: todas las recetas del usuario, públicas y privadas, con filtro Todas / Públicas / Privadas.
 - **Explorar**: recetas públicas de todos los usuarios, con su autor.
+- En los listados (Mis recetas y Explorar) cada receta trae `ingredientCount` en vez de la lista de ingredientes y pasos.
 
 ---
 
@@ -201,9 +203,9 @@ Ningún campo obligatorio puede quedar vacío (se aplica `trim`). Cada campo tie
 | `ingredients`            | Sí          | 1–30 elementos. |
 | `ingredients[].name`     | Sí          | 2–20 caracteres. |
 | `ingredients[].quantity` | Sí          | Número > 0 y ≤ 9999. |
-| `ingredients[].unit`     | Sí          | `unidades` \| `g` \| `ml` \| `tazas` \| `cucharadas` |
+| `ingredients[].unit`     | Sí          | `g` \| `kg` \| `ml` \| `l` \| `lb` \| `oz` \| `fl. oz.` \| `tazas` \| `cucharadas` \| `cucharaditas` \| `unidades` \| `dientes` \| `hojas` \| `pizcas` \| `puñados` \| `chorritos` \| `paquetes` |
 | `steps`                  | Sí          | 1–30 elementos, en orden. |
-| `steps[].description`    | Sí          | 3–150 caracteres. |
+| `steps[].description`    | Sí          | 3–300 caracteres. |
 | `groupIds`               | No          | Ids de grupos propios. |
 
 ### Imagen de receta
@@ -269,6 +271,7 @@ Base URL: `/api/v1`
 
 | Método | Ruta                            | Descripción |
 | ------ | ------------------------------- | ----------- |
+| GET    | `/groups`                       | Mis grupos (con `recipeCount`, `coverUrl` y `coverUrls`) |
 | GET    | `/groups`                       | Mis grupos (con `recipeCount` y `coverUrl`) |
 | GET    | `/groups/:id`                   | Detalle del grupo y sus recetas |
 | POST   | `/groups`                       | Crear grupo |

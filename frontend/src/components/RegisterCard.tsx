@@ -53,7 +53,7 @@ export default function RegisterCard({ onSubmit, loading = false, errors }: Regi
         placeholder="Mínimo 6 caracteres"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        revealable
         autoCapitalize="none"
         autoComplete="new-password"
         textContentType="newPassword"

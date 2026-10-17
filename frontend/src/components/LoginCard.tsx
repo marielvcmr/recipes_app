@@ -38,7 +38,7 @@ export default function LoginCard({ onSubmit, loading = false, errors }: LoginCa
         placeholder="Mínimo 6 caracteres"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        revealable
         autoCapitalize="none"
         autoComplete="password"
         textContentType="password"

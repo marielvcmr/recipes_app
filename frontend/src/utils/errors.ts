@@ -10,6 +10,8 @@ export type FormErrors = {
 const DUPLICATE_FIELDS: Record<string, string> = {
   EMAIL_TAKEN: 'email',
   USERNAME_TAKEN: 'username',
+  DUPLICATE_RECIPE_NAME: 'name',
+  DUPLICATE_GROUP_NAME: 'name',
 };
 
 // Convierte cualquier error de una petición en mensajes listos para mostrar en un formulario

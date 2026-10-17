@@ -46,3 +46,11 @@ flowchart LR
 | [`backend/README.md`](backend/README.md) | Stack, arquitectura, estructura, cómo ejecutar, reglas de negocio, validaciones y endpoints. |
 | [`backend/docs/DESIGN.md`](backend/docs/DESIGN.md) | Entidades, relaciones y diseño de la base de datos en MongoDB. |
 | [`frontend/README.md`](frontend/README.md) | Stack, arquitectura, estructura, pantallas y cómo ejecutar la app móvil. |
+
+---
+
+### Proyecto realizado por:
+- Marielv Mavárez
+- Mariángeles Mavárez
+  
+Para la materia Programación de Dispositivos Móviles de la Universidad Rafael Urdaneta.

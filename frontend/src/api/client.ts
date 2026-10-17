@@ -21,6 +21,9 @@ const API_URL = resolveApiUrl();
 
 // Si el servidor no responde en este tiempo, se corta la petición
 const TIMEOUT_MS = 10_000;
+// Subir una foto tarda más: el backend además la reenvía a Cloudinary, y con una conexión
+// de subida lenta eso solo puede pasar de 30 s (la foto llegaba, pero la app ya había cortado)
+const UPLOAD_TIMEOUT_MS = 90_000;
 
 // Error con el mismo formato que devuelve el backend: { error: { code, message, details } }
 export class ApiError extends Error {
@@ -62,23 +65,28 @@ async function request<T>(path: string, { method = 'GET', body }: RequestOptions
     throw new ApiError(0, 'CONFIG_ERROR', 'No se encontró la URL del backend (EXPO_PUBLIC_API_URL).');
   }
 
+  // FormData (subir una foto) va tal cual: fetch pone solo el Content-Type multipart con su boundary
+  const isFormData = body instanceof FormData;
+
   const headers: Record<string, string> = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (body !== undefined && !isFormData) headers['Content-Type'] = 'application/json';
   if (authToken) headers.Authorization = `Bearer ${authToken}`;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), isFormData ? UPLOAD_TIMEOUT_MS : TIMEOUT_MS);
 
   let response: Response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
       signal: controller.signal,
     });
-  } catch {
-    // No hubo respuesta: IP o puerto equivocados, backend apagado, otra red WiFi o firewall
+  } catch (error) {
+    // No hubo respuesta: IP o puerto equivocados, backend apagado, otra red WiFi o firewall.
+    // En desarrollo se imprime el error real: fetch también falla así si el body no se puede enviar
+    if (__DEV__) console.warn(`${method} ${path} falló antes de llegar al servidor:`, error);
     throw new ApiError(0, 'NETWORK_ERROR', 'No se pudo conectar con el servidor.');
   } finally {
     clearTimeout(timeout);

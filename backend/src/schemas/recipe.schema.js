@@ -20,15 +20,15 @@ const ingredientSchema = z.object({
     .number({ error: 'La cantidad debe ser un número.' })
     .positive('La cantidad debe ser mayor que 0.')
     .max(9999, 'La cantidad no puede superar 9999.'),
-  unit: z.enum(UNITS, { error: 'La unidad debe ser: unidades, g, ml, tazas o cucharadas.' }),
+  unit: z.enum(UNITS, { error: `La unidad debe ser una de: ${UNITS.join(', ')}.` }),
 });
 
 const stepSchema = z.object({
   description: z
     .string({ error: 'La descripción del paso es obligatoria.' })
     .trim()
-    .min(3, 'Cada paso debe tener entre 3 y 150 caracteres.')
-    .max(150, 'Cada paso debe tener entre 3 y 150 caracteres.'),
+    .min(3, 'Cada paso debe tener entre 3 y 300 caracteres.')
+    .max(300, 'Cada paso debe tener entre 3 y 300 caracteres.'),
 });
 
 export const createRecipeSchema = z.object({

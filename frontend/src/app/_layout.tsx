@@ -9,6 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { BlurTargetProvider } from '@/context/BlurTargetContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,7 +27,9 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <RootNavigator />
+      <BlurTargetProvider>
+        <RootNavigator />
+      </BlurTargetProvider>
     </AuthProvider>
   );
 }

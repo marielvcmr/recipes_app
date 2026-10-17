@@ -36,11 +36,19 @@ function activeIn(groupId) {
   return { groups: { $elemMatch: { group: groupId, isActive: true } } };
 }
 
-async function findCoverUrl(groupId) {
-  const recipe = await Recipe.findOne({ ...activeIn(groupId), imageUrl: { $ne: null } })
+// Portada: fotos de las 2 primeras recetas A–Z que tengan foto
+const COVER_SIZE = 2;
+
+function withCover(coverUrls) {
+  return { coverUrl: coverUrls[0] ?? null, coverUrls };
+}
+
+async function findCoverUrls(groupId) {
+  const recipes = await Recipe.find({ ...activeIn(groupId), imageUrl: { $ne: null } })
     .sort({ nameNormalized: 1 })
+    .limit(COVER_SIZE)
     .select('imageUrl');
-  return recipe?.imageUrl ?? null;
+  return recipes.map((recipe) => recipe.imageUrl);
 }
 
 async function addRecipes(group, recipes) {
@@ -51,11 +59,11 @@ async function addRecipes(group, recipes) {
 }
 
 async function withRecipeCount(group) {
-  const [recipeCount, coverUrl] = await Promise.all([
+  const [recipeCount, coverUrls] = await Promise.all([
     Recipe.countDocuments(activeIn(group._id)),
-    findCoverUrl(group._id),
+    findCoverUrls(group._id),
   ]);
-  return { ...group.toJSON(), recipeCount, coverUrl };
+  return { ...group.toJSON(), recipeCount, ...withCover(coverUrls) };
 }
 
 
@@ -86,8 +94,11 @@ export async function getGroup(ownerId, groupId) {
   const recipes = await Recipe.find(activeIn(group._id))
     .select('-ingredients -steps -groups')
     .sort({ nameNormalized: 1 });
-    const coverUrl = recipes.find((recipe) => recipe.imageUrl)?.imageUrl ?? null;
-  return { ...group.toJSON(), recipeCount: recipes.length, coverUrl, recipes };
+  const coverUrls = recipes
+    .filter((recipe) => recipe.imageUrl)
+    .slice(0, COVER_SIZE)
+    .map((recipe) => recipe.imageUrl);
+  return { ...group.toJSON(), recipeCount: recipes.length, ...withCover(coverUrls), recipes };
 }
 
 export async function renameGroup(ownerId, groupId, { name }) {

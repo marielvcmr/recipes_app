@@ -2,6 +2,7 @@
 
 API REST de CookPlan: usuarios, recetas y grupos.
 Diseño de la base de datos: [`docs/DESIGN.md`](docs/DESIGN.md)
+Contrato para el frontend: [`../docs/frontContract.md`](../docs/frontContract.md)
 
 ---
 
@@ -14,6 +15,7 @@ Diseño de la base de datos: [`docs/DESIGN.md`](docs/DESIGN.md)
 | Framework     | Express 5                          |
 | Base de datos | MongoDB (Atlas) + Mongoose         |
 | Autenticación | JWT + bcrypt                       |
+| Validación    | zod                                |
 | Seguridad     | helmet, cors, express-rate-limit   |
 | Imágenes      | multer + Cloudinary                |
 
@@ -28,32 +30,78 @@ backend/
 │   └── DESIGN.md
 ├── src/
 │   ├── config/
-│   │   ├── env.js
-│   │   ├── db.js
-│   │   └── cloudinary.js
+│   │   ├── env.js              # Lee y valida las variables de entorno
+│   │   ├── db.js               # Conexión a MongoDB
+│   │   └── cloudinary.js       # Configuración de Cloudinary
 │   ├── models/
 │   │   ├── user.model.js
-│   │   ├── recipe.model.js
+│   │   ├── recipe.model.js     # Incluye ingredientes, pasos y pertenencia a grupos
 │   │   └── group.model.js
+│   ├── schemas/                # Validación de entrada con zod
+│   │   ├── auth.schema.js
+│   │   ├── user.schema.js
+│   │   ├── recipe.schema.js
+│   │   └── group.schema.js
 │   ├── routes/
-│   │   ├── index.js
+│   │   ├── index.js            # Monta /health, /auth, /users, /recipes y /groups
 │   │   ├── auth.routes.js
 │   │   ├── user.routes.js
 │   │   ├── recipe.routes.js
 │   │   └── group.routes.js
 │   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── user.controller.js
+│   │   ├── recipe.controller.js
+│   │   └── group.controller.js
 │   ├── services/
+│   │   ├── auth.service.js
+│   │   ├── user.service.js
+│   │   ├── recipe.service.js
+│   │   ├── group.service.js
+│   │   └── image.service.js    # Subida y borrado de fotos en Cloudinary
 │   ├── middlewares/
-│   │   ├── auth.js
-│   │   ├── upload.js
-│   │   └── errorHandler.js
+│   │   ├── auth.js             # requireAuth: verifica el JWT
+│   │   ├── validate.js         # Aplica un esquema zod al body o al query
+│   │   ├── rateLimit.js        # Límite de intentos de login
+│   │   ├── upload.js           # Recepción de la foto (multer)
+│   │   └── errorHandler.js     # 404 y formato único de errores
 │   ├── utils/
-│   ├── app.js
-│   └── server.js
+│   │   ├── AppError.js         # Error con status, código y detalles
+│   │   ├── jwt.js              # Firmar y verificar tokens
+│   │   ├── fieldRules.js       # Regex y valores permitidos
+│   │   └── normalizer.js       # Normalizar nombres y escapar búsquedas
+│   ├── app.js                  # Express: middlewares globales y rutas
+│   └── server.js               # Conecta la base de datos y arranca el servidor
 ├── .env.example
 ├── package.json
-└── pnpm-lock.yaml
+├── pnpm-lock.yaml
+└── pnpm-workspace.yaml
 ```
+
+---
+
+## Arquitectura
+
+```mermaid
+flowchart LR
+    REQ(["Petición"]) --> R["Routes"] --> MW["Middlewares<br/>auth · validate · upload"] --> C["Controllers"] --> S["Services"] --> M["Models"] --> DB[("MongoDB")]
+    S -.-> IMG[("Cloudinary")]
+    MW -. error .-> ERR["Error handler"]
+    S -. error .-> ERR
+    ERR --> RES(["Respuesta de error"])
+```
+
+Cada petición pasa por las mismas capas en orden. Si algo falla en cualquier punto, el error va al manejador de errores, que responde siempre con el mismo formato.
+
+| Capa          | Responsabilidad                                                      |
+| ------------- | -------------------------------------------------------------------- |
+| `routes`      | Define los endpoints y los asocia a sus middlewares y controlador.   |
+| `middlewares` | Autenticación, validación, límite de intentos, imágenes y errores.   |
+| `schemas`     | Reglas de validación de lo que llega en el body o el query (zod).    |
+| `controllers` | Reciben la petición HTTP y devuelven la respuesta.                   |
+| `services`    | Contienen la lógica de negocio.                                      |
+| `models`      | Esquemas de Mongoose: forma de los datos y sus validaciones.         |
+| `utils`       | Piezas compartidas: errores, JWT, reglas de campos, normalización.   |
 
 ---
 
@@ -72,10 +120,19 @@ backend/
 
 ---
 
+## Cómo ejecutar
+
+1. Dentro de `backend/`: `pnpm install`.
+2. Copiar `.env.example` a `.env` y completar los valores (pedirlos al equipo por un canal privado; `.env` nunca se sube al repo).
+3. `pnpm dev`: arranca en `http://localhost:3000/api/v1` y se reinicia al guardar archivos `.js`. Los cambios en `.env` requieren reiniciar a mano.
+4. Comprobar: `GET /api/v1/health` → `{ "data": { "ok": true } }`.
+
+---
+
 ## Autenticación
 
 - Registro e inicio de sesión (con correo y clave) devuelven un **JWT**.
-- Todas las rutas, salvo `/auth/*`, requieren el header `Authorization: Bearer <token>`.
+- Todas las rutas, salvo `/auth/*` y `/health`, requieren el header `Authorization: Bearer <token>`.
 - El dueño de recetas y grupos siempre se toma del token, nunca del body.
 - Cerrar sesión se hace en el cliente, descartando el token.
 
@@ -111,6 +168,7 @@ backend/
 - Quitar una receta de un grupo es un **borrado lógico**: la asociación no se elimina, se marca como inactiva (`isActive: false`) y la receta deja de aparecer en ese grupo. La receta sigue existiendo.
 - Si la receta se vuelve a añadir al mismo grupo, la asociación se reactiva (`isActive: true`).
 - Borrar un grupo borra también las recetas que están activas en él, aunque estén en otros grupos. Las que habían sido quitadas del grupo no se borran. El front debe advertirlo usando `recipeCount`.
+- Cada grupo incluye `coverUrl`: la foto de su primera receta activa (orden alfabético) que tenga imagen, o `null` si ninguna tiene. Se calcula en cada petición, así que siempre está actualizada.
 
 **Vistas**
 - **Mis recetas**: todas las recetas del usuario, públicas y privadas, con filtro Todas / Públicas / Privadas.
@@ -173,6 +231,12 @@ Se envía como `multipart/form-data` en el campo `image`.
 
 Base URL: `/api/v1`
 
+### Health
+
+| Método | Ruta      | Descripción |
+| ------ | --------- | ----------- |
+| GET    | `/health` | Comprueba que la API responde. No requiere token. |
+
 ### Auth
 
 | Método | Ruta             | Descripción     |
@@ -205,7 +269,7 @@ Base URL: `/api/v1`
 
 | Método | Ruta                            | Descripción |
 | ------ | ------------------------------- | ----------- |
-| GET    | `/groups`                       | Mis grupos (con `recipeCount`) |
+| GET    | `/groups`                       | Mis grupos (con `recipeCount` y `coverUrl`) |
 | GET    | `/groups/:id`                   | Detalle del grupo y sus recetas |
 | POST   | `/groups`                       | Crear grupo |
 | PATCH  | `/groups/:id`                   | Renombrar grupo |
